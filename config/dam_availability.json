@@ -1,0 +1,1546 @@
+{
+  "generated": "2026-09-07",
+  "usace_month": "2026-08",
+  "dart_year": 2025,
+  "species_probed": [
+    "Chinook"
+  ],
+  "dart_param_mode": "corrected",
+  "eia_year": 2024,
+  "dams": {
+    "BON": {
+      "name": "Bonneville",
+      "river": "Columbia",
+      "operator": "USACE",
+      "expect_passage": true,
+      "has_flow": true,
+      "has_generation": true,
+      "has_flow_generation": true,
+      "flow_source": "usace_hist_csv",
+      "generation_source": "usace_hist_csv",
+      "has_temperature": true,
+      "temperature_site": "BON",
+      "temperature_parameter": "Temp (WQM)",
+      "temperature_from_scroll_case": false,
+      "temperature_from_tailwater": false,
+      "has_fish_passage": true,
+      "usace": {
+        "ok": true,
+        "n_rows": 744,
+        "n_data_rows": 744,
+        "columns": [
+          "Date",
+          "BON",
+          "BON W Temp",
+          "CCIW",
+          "CCIW W Temp",
+          "WRNO",
+          "WRNO W Temp",
+          "CWMW",
+          "CWMW W Temp",
+          "Gen",
+          "Gen Flow",
+          "Spill Flow",
+          "Flex Spill Hours",
+          "Misc Flow",
+          "Total Flow",
+          "FB Elev",
+          "TW Elev PH1",
+          "TW Elev - Tan Crk",
+          "Head",
+          "CCIW Sensor Depth",
+          "WRNO Sensor Depth",
+          "Units",
+          "Gen PH2",
+          "Gen Flow PH2",
+          "Units PH2",
+          "unnamed_25"
+        ],
+        "has_gen": true,
+        "has_flow": true,
+        "scraper_parse_ok": false,
+        "file_exists": true,
+        "ragged_header": true,
+        "error": "RuntimeError: Failed to fetch https://www.nwd-wc.usace.army.mil/dd/nwdp/hist_csv/www/bon_202608.csv after 2 attempts: Error tokenizing data. C error: Expected 25 fields in line 3, saw 26\n"
+      },
+      "cwms": null,
+      "eia": null,
+      "temperature": {
+        "ok": true,
+        "n_rows": 369,
+        "n_values": 195,
+        "site": "BON",
+        "parameter": "Temp (WQM)",
+        "from_scroll_case": false,
+        "from_tailwater": false,
+        "attempts": [
+          {
+            "site": "BON",
+            "parameter": "Temp (WQM)",
+            "n_values": 195,
+            "error": null
+          }
+        ],
+        "error": null
+      },
+      "passage": {
+        "ok": true,
+        "n_rows": 369,
+        "n_values": 365,
+        "total_fish": 632461.0,
+        "mode": "corrected",
+        "error": null
+      }
+    },
+    "TDA": {
+      "name": "The Dalles",
+      "river": "Columbia",
+      "operator": "USACE",
+      "expect_passage": true,
+      "has_flow": true,
+      "has_generation": true,
+      "has_flow_generation": true,
+      "flow_source": "usace_hist_csv",
+      "generation_source": "usace_hist_csv",
+      "has_temperature": true,
+      "temperature_site": "TDA",
+      "temperature_parameter": "Temp (WQM)",
+      "temperature_from_scroll_case": false,
+      "temperature_from_tailwater": false,
+      "has_fish_passage": true,
+      "usace": {
+        "ok": true,
+        "n_rows": 744,
+        "n_data_rows": 744,
+        "columns": [
+          "Date",
+          "TDA",
+          "TDA W Temp",
+          "TDDO",
+          "TDDO W Temp",
+          "BON",
+          "BON W Temp",
+          "% Spill",
+          "Gen",
+          "Gen Flow",
+          "Spill Flow",
+          "Flex Spill Hours",
+          "Misc Flow",
+          "Total Flow",
+          "FB Elev",
+          "TW Elev",
+          "Head",
+          "TDDO Sensor Depth",
+          "Units",
+          "unnamed_19"
+        ],
+        "has_gen": true,
+        "has_flow": true,
+        "scraper_parse_ok": false,
+        "file_exists": true,
+        "ragged_header": true,
+        "error": "RuntimeError: Failed to fetch https://www.nwd-wc.usace.army.mil/dd/nwdp/hist_csv/www/tda_202608.csv after 2 attempts: Error tokenizing data. C error: Expected 19 fields in line 3, saw 20\n"
+      },
+      "cwms": null,
+      "eia": null,
+      "temperature": {
+        "ok": true,
+        "n_rows": 369,
+        "n_values": 196,
+        "site": "TDA",
+        "parameter": "Temp (WQM)",
+        "from_scroll_case": false,
+        "from_tailwater": false,
+        "attempts": [
+          {
+            "site": "TDA",
+            "parameter": "Temp (WQM)",
+            "n_values": 196,
+            "error": null
+          }
+        ],
+        "error": null
+      },
+      "passage": {
+        "ok": true,
+        "n_rows": 369,
+        "n_values": 306,
+        "total_fish": 361108.0,
+        "mode": "corrected",
+        "error": null
+      }
+    },
+    "JDA": {
+      "name": "John Day",
+      "river": "Columbia",
+      "operator": "USACE",
+      "expect_passage": true,
+      "has_flow": true,
+      "has_generation": true,
+      "has_flow_generation": true,
+      "flow_source": "usace_hist_csv",
+      "generation_source": "usace_hist_csv",
+      "has_temperature": true,
+      "temperature_site": "JDA",
+      "temperature_parameter": "Temp (WQM)",
+      "temperature_from_scroll_case": false,
+      "temperature_from_tailwater": false,
+      "has_fish_passage": true,
+      "usace": {
+        "ok": true,
+        "n_rows": 744,
+        "n_data_rows": 744,
+        "columns": [
+          "Date",
+          "JDY",
+          "JDY W Temp",
+          "JHAW",
+          "JHAW W Temp",
+          "TDA",
+          "TDA W Temp",
+          "% Spill",
+          "Gen",
+          "Gen Flow",
+          "Spill Flow",
+          "Flex Spill Hours",
+          "Misc Flow",
+          "Total Flow",
+          "FB Elev",
+          "TW Elev",
+          "Head",
+          "JHAW Sensor Depth",
+          "120% Spill Cap",
+          "unnamed_19",
+          "unnamed_20"
+        ],
+        "has_gen": true,
+        "has_flow": true,
+        "scraper_parse_ok": false,
+        "file_exists": true,
+        "ragged_header": true,
+        "error": "RuntimeError: Failed to fetch https://www.nwd-wc.usace.army.mil/dd/nwdp/hist_csv/www/jda_202608.csv after 2 attempts: Error tokenizing data. C error: Expected 19 fields in line 3, saw 21\n"
+      },
+      "cwms": null,
+      "eia": null,
+      "temperature": {
+        "ok": true,
+        "n_rows": 369,
+        "n_values": 195,
+        "site": "JDA",
+        "parameter": "Temp (WQM)",
+        "from_scroll_case": false,
+        "from_tailwater": false,
+        "attempts": [
+          {
+            "site": "JDA",
+            "parameter": "Temp (WQM)",
+            "n_values": 195,
+            "error": null
+          }
+        ],
+        "error": null
+      },
+      "passage": {
+        "ok": true,
+        "n_rows": 369,
+        "n_values": 214,
+        "total_fish": 258464.0,
+        "mode": "corrected",
+        "error": null
+      }
+    },
+    "MCN": {
+      "name": "McNary",
+      "river": "Columbia",
+      "operator": "USACE",
+      "expect_passage": true,
+      "has_flow": true,
+      "has_generation": true,
+      "has_flow_generation": true,
+      "flow_source": "usace_hist_csv",
+      "generation_source": "usace_hist_csv",
+      "has_temperature": true,
+      "temperature_site": "MCN",
+      "temperature_parameter": "Temp (WQM)",
+      "temperature_from_scroll_case": false,
+      "temperature_from_tailwater": false,
+      "has_fish_passage": true,
+      "usace": {
+        "ok": true,
+        "n_rows": 744,
+        "n_data_rows": 744,
+        "columns": [
+          "Date",
+          "PAQW",
+          "PAQW W Temp",
+          "MCNA",
+          "MCNA W Temp",
+          "MCPW",
+          "MCPW W Temp",
+          "JDY",
+          "JDY W Temp",
+          "% Spill",
+          "Gen",
+          "Gen Flow",
+          "Spill Flow",
+          "Flex Spill Hours",
+          "Misc Flow",
+          "Total Flow",
+          "FB Elev",
+          "TW Elev",
+          "Head",
+          "MCPW Sensor Depth",
+          "Units",
+          "125% Spill Cap",
+          "unnamed_22"
+        ],
+        "has_gen": true,
+        "has_flow": true,
+        "scraper_parse_ok": false,
+        "file_exists": true,
+        "ragged_header": true,
+        "error": "RuntimeError: Failed to fetch https://www.nwd-wc.usace.army.mil/dd/nwdp/hist_csv/www/mcn_202608.csv after 2 attempts: Error tokenizing data. C error: Expected 22 fields in line 3, saw 23\n"
+      },
+      "cwms": null,
+      "eia": null,
+      "temperature": {
+        "ok": true,
+        "n_rows": 369,
+        "n_values": 189,
+        "site": "MCN",
+        "parameter": "Temp (WQM)",
+        "from_scroll_case": false,
+        "from_tailwater": false,
+        "attempts": [
+          {
+            "site": "MCN",
+            "parameter": "Temp (WQM)",
+            "n_values": 189,
+            "error": null
+          }
+        ],
+        "error": null
+      },
+      "passage": {
+        "ok": true,
+        "n_rows": 369,
+        "n_values": 214,
+        "total_fish": 233223.0,
+        "mode": "corrected",
+        "error": null
+      }
+    },
+    "IHR": {
+      "name": "Ice Harbor",
+      "river": "Snake",
+      "operator": "USACE",
+      "expect_passage": true,
+      "has_flow": true,
+      "has_generation": true,
+      "has_flow_generation": true,
+      "flow_source": "usace_hist_csv",
+      "generation_source": "usace_hist_csv",
+      "has_temperature": true,
+      "temperature_site": "IHR",
+      "temperature_parameter": "Temp (WQM)",
+      "temperature_from_scroll_case": false,
+      "temperature_from_tailwater": false,
+      "has_fish_passage": true,
+      "usace": {
+        "ok": true,
+        "n_rows": 744,
+        "n_data_rows": 744,
+        "columns": [
+          "Date",
+          "IHRA",
+          "IHRA W Temp",
+          "IDSW",
+          "IDSW W Temp",
+          "MCNA",
+          "MCNA W Temp",
+          "% Spill",
+          "Gen",
+          "Gen Flow",
+          "Spill Flow",
+          "Flex Spill Hours",
+          "Misc Flow",
+          "Total Flow",
+          "FB Elev",
+          "TW Elev",
+          "Head",
+          "IDSW Sensor Depth",
+          "Units",
+          "125% Spill Cap",
+          "unnamed_20"
+        ],
+        "has_gen": true,
+        "has_flow": true,
+        "scraper_parse_ok": false,
+        "file_exists": true,
+        "ragged_header": true,
+        "error": "RuntimeError: Failed to fetch https://www.nwd-wc.usace.army.mil/dd/nwdp/hist_csv/www/ihr_202608.csv after 2 attempts: Error tokenizing data. C error: Expected 20 fields in line 3, saw 21\n"
+      },
+      "cwms": null,
+      "eia": null,
+      "temperature": {
+        "ok": true,
+        "n_rows": 369,
+        "n_values": 190,
+        "site": "IHR",
+        "parameter": "Temp (WQM)",
+        "from_scroll_case": false,
+        "from_tailwater": false,
+        "attempts": [
+          {
+            "site": "IHR",
+            "parameter": "Temp (WQM)",
+            "n_values": 190,
+            "error": null
+          }
+        ],
+        "error": null
+      },
+      "passage": {
+        "ok": true,
+        "n_rows": 369,
+        "n_values": 306,
+        "total_fish": 91577.0,
+        "mode": "corrected",
+        "error": null
+      }
+    },
+    "LGS": {
+      "name": "Little Goose",
+      "river": "Snake",
+      "operator": "USACE",
+      "expect_passage": true,
+      "has_flow": true,
+      "has_generation": true,
+      "has_flow_generation": true,
+      "flow_source": "usace_hist_csv",
+      "generation_source": "usace_hist_csv",
+      "has_temperature": true,
+      "temperature_site": "LGS",
+      "temperature_parameter": "Temp (WQM)",
+      "temperature_from_scroll_case": false,
+      "temperature_from_tailwater": false,
+      "has_fish_passage": true,
+      "usace": {
+        "ok": true,
+        "n_rows": 745,
+        "n_data_rows": 744,
+        "columns": [
+          "site",
+          "Date",
+          "LGSA",
+          "LGSA W Temp",
+          "LGSW",
+          "LGSW W Temp",
+          "LMNA",
+          "LMNA W Temp",
+          "% Spill",
+          "Gen",
+          "Gen Flow",
+          "Spill Flow",
+          "Flex Spill Hours",
+          "Misc Flow",
+          "Total Flow",
+          "FB Elev",
+          "TW Elev",
+          "Head",
+          "LGSW Sensor Depth",
+          "Units",
+          "125% Spill Cap",
+          "Top of Operating",
+          "Bottom of Operating"
+        ],
+        "has_gen": true,
+        "has_flow": true,
+        "scraper_parse_ok": true,
+        "file_exists": true,
+        "ragged_header": false,
+        "error": null
+      },
+      "cwms": null,
+      "eia": null,
+      "temperature": {
+        "ok": true,
+        "n_rows": 369,
+        "n_values": 196,
+        "site": "LGS",
+        "parameter": "Temp (WQM)",
+        "from_scroll_case": false,
+        "from_tailwater": false,
+        "attempts": [
+          {
+            "site": "LGS",
+            "parameter": "Temp (WQM)",
+            "n_values": 196,
+            "error": null
+          }
+        ],
+        "error": null
+      },
+      "passage": {
+        "ok": true,
+        "n_rows": 369,
+        "n_values": 214,
+        "total_fish": 83564.0,
+        "mode": "corrected",
+        "error": null
+      }
+    },
+    "LMN": {
+      "name": "Lower Monumental",
+      "river": "Snake",
+      "operator": "USACE",
+      "expect_passage": true,
+      "has_flow": true,
+      "has_generation": true,
+      "has_flow_generation": true,
+      "flow_source": "usace_hist_csv",
+      "generation_source": "usace_hist_csv",
+      "has_temperature": true,
+      "temperature_site": "LMN",
+      "temperature_parameter": "Temp (WQM)",
+      "temperature_from_scroll_case": false,
+      "temperature_from_tailwater": false,
+      "has_fish_passage": true,
+      "usace": {
+        "ok": true,
+        "n_rows": 744,
+        "n_data_rows": 744,
+        "columns": [
+          "Date",
+          "LMNA",
+          "LMNA W Temp",
+          "LMNW",
+          "LMNW W Temp",
+          "IHRA",
+          "IHRA W Temp",
+          "% Spill",
+          "Gen",
+          "Gen Flow",
+          "Spill Flow",
+          "Flex Spill Hours",
+          "Misc Flow",
+          "Total Flow",
+          "FB Elev",
+          "TW Elev",
+          "Head",
+          "LMNW Sensor Depth",
+          "Units",
+          "125% Spill Cap",
+          "unnamed_20"
+        ],
+        "has_gen": true,
+        "has_flow": true,
+        "scraper_parse_ok": false,
+        "file_exists": true,
+        "ragged_header": true,
+        "error": "RuntimeError: Failed to fetch https://www.nwd-wc.usace.army.mil/dd/nwdp/hist_csv/www/lmn_202608.csv after 2 attempts: Error tokenizing data. C error: Expected 20 fields in line 3, saw 21\n"
+      },
+      "cwms": null,
+      "eia": null,
+      "temperature": {
+        "ok": true,
+        "n_rows": 369,
+        "n_values": 197,
+        "site": "LMN",
+        "parameter": "Temp (WQM)",
+        "from_scroll_case": false,
+        "from_tailwater": false,
+        "attempts": [
+          {
+            "site": "LMN",
+            "parameter": "Temp (WQM)",
+            "n_values": 197,
+            "error": null
+          }
+        ],
+        "error": null
+      },
+      "passage": {
+        "ok": true,
+        "n_rows": 369,
+        "n_values": 214,
+        "total_fish": 87647.0,
+        "mode": "corrected",
+        "error": null
+      }
+    },
+    "LWG": {
+      "name": "Lower Granite",
+      "river": "Snake",
+      "operator": "USACE",
+      "expect_passage": true,
+      "has_flow": true,
+      "has_generation": true,
+      "has_flow_generation": true,
+      "flow_source": "usace_hist_csv",
+      "generation_source": "usace_hist_csv",
+      "has_temperature": true,
+      "temperature_site": "LWG",
+      "temperature_parameter": "Temp (WQM)",
+      "temperature_from_scroll_case": false,
+      "temperature_from_tailwater": false,
+      "has_fish_passage": true,
+      "usace": {
+        "ok": true,
+        "n_rows": 745,
+        "n_data_rows": 744,
+        "columns": [
+          "site",
+          "Date",
+          "LWG",
+          "LWG W Temp",
+          "LGNW",
+          "LGNW W Temp",
+          "LGSA",
+          "LGSA W Temp",
+          "% Spill",
+          "Gen",
+          "Gen Flow",
+          "Spill Flow",
+          "Flex Spill Hours",
+          "Misc Flow",
+          "Total Flow",
+          "FB Elev",
+          "TW Elev",
+          "Head",
+          "LGNW Sensor Depth",
+          "Units",
+          "125% Spill Cap"
+        ],
+        "has_gen": true,
+        "has_flow": true,
+        "scraper_parse_ok": true,
+        "file_exists": true,
+        "ragged_header": false,
+        "error": null
+      },
+      "cwms": null,
+      "eia": null,
+      "temperature": {
+        "ok": true,
+        "n_rows": 369,
+        "n_values": 185,
+        "site": "LWG",
+        "parameter": "Temp (WQM)",
+        "from_scroll_case": false,
+        "from_tailwater": false,
+        "attempts": [
+          {
+            "site": "LWG",
+            "parameter": "Temp (WQM)",
+            "n_values": 185,
+            "error": null
+          }
+        ],
+        "error": null
+      },
+      "passage": {
+        "ok": true,
+        "n_rows": 369,
+        "n_values": 305,
+        "total_fish": 81659.0,
+        "mode": "corrected",
+        "error": null
+      }
+    },
+    "PRD": {
+      "name": "Priest Rapids",
+      "river": "Columbia",
+      "operator": "Grant PUD",
+      "expect_passage": true,
+      "has_flow": true,
+      "has_generation": true,
+      "has_flow_generation": true,
+      "flow_source": "cwms_api",
+      "generation_source": "eia923_monthly",
+      "has_temperature": true,
+      "temperature_site": "PRD",
+      "temperature_parameter": "Temp (WQM)",
+      "temperature_from_scroll_case": false,
+      "temperature_from_tailwater": false,
+      "has_fish_passage": true,
+      "usace": {
+        "ok": false,
+        "n_rows": 0,
+        "n_data_rows": 0,
+        "columns": [],
+        "has_gen": false,
+        "has_flow": false,
+        "scraper_parse_ok": false,
+        "file_exists": false,
+        "ragged_header": false,
+        "error": "RuntimeError: Failed to fetch https://www.nwd-wc.usace.army.mil/dd/nwdp/hist_csv/www/prd_202608.csv after 2 attempts: 404 Client Error: Not Found for url: https://www.nwd-wc.usace.army.mil/dd/nwdp/hist_csv/www/prd_"
+      },
+      "cwms": {
+        "ok": true,
+        "n_values": 73,
+        "units": "cfs",
+        "ts_id": "PRD.Flow-Out.Ave.1Hour.1Hour.CBT-REV",
+        "error": null
+      },
+      "eia": {
+        "ok": true,
+        "plant_id": 3887,
+        "n_months": 12,
+        "annual_mwh": 3837773.0,
+        "year": 2024,
+        "error": null
+      },
+      "temperature": {
+        "ok": true,
+        "n_rows": 369,
+        "n_values": 357,
+        "site": "PRD",
+        "parameter": "Temp (WQM)",
+        "from_scroll_case": false,
+        "from_tailwater": false,
+        "attempts": [
+          {
+            "site": "PRD",
+            "parameter": "Temp (WQM)",
+            "n_values": 357,
+            "error": null
+          }
+        ],
+        "error": null
+      },
+      "passage": {
+        "ok": true,
+        "n_rows": 369,
+        "n_values": 215,
+        "total_fish": 75893.0,
+        "mode": "corrected",
+        "error": null
+      }
+    },
+    "WAN": {
+      "name": "Wanapum",
+      "river": "Columbia",
+      "operator": "Grant PUD",
+      "expect_passage": true,
+      "has_flow": true,
+      "has_generation": true,
+      "has_flow_generation": true,
+      "flow_source": "cwms_api",
+      "generation_source": "eia923_monthly",
+      "has_temperature": true,
+      "temperature_site": "WAN",
+      "temperature_parameter": "Temp (WQM)",
+      "temperature_from_scroll_case": false,
+      "temperature_from_tailwater": false,
+      "has_fish_passage": true,
+      "usace": {
+        "ok": false,
+        "n_rows": 0,
+        "n_data_rows": 0,
+        "columns": [],
+        "has_gen": false,
+        "has_flow": false,
+        "scraper_parse_ok": false,
+        "file_exists": false,
+        "ragged_header": false,
+        "error": "RuntimeError: Failed to fetch https://www.nwd-wc.usace.army.mil/dd/nwdp/hist_csv/www/wan_202608.csv after 2 attempts: 404 Client Error: Not Found for url: https://www.nwd-wc.usace.army.mil/dd/nwdp/hist_csv/www/wan_"
+      },
+      "cwms": {
+        "ok": true,
+        "n_values": 73,
+        "units": "cfs",
+        "ts_id": "WAN.Flow-Out.Ave.1Hour.1Hour.CBT-REV",
+        "error": null
+      },
+      "eia": {
+        "ok": true,
+        "plant_id": 3888,
+        "n_months": 12,
+        "annual_mwh": 4052946.0,
+        "year": 2024,
+        "error": null
+      },
+      "temperature": {
+        "ok": true,
+        "n_rows": 369,
+        "n_values": 352,
+        "site": "WAN",
+        "parameter": "Temp (WQM)",
+        "from_scroll_case": false,
+        "from_tailwater": false,
+        "attempts": [
+          {
+            "site": "WAN",
+            "parameter": "Temp (WQM)",
+            "n_values": 352,
+            "error": null
+          }
+        ],
+        "error": null
+      },
+      "passage": {
+        "ok": true,
+        "n_rows": 369,
+        "n_values": 215,
+        "total_fish": 67355.0,
+        "mode": "corrected",
+        "error": null
+      }
+    },
+    "RIS": {
+      "name": "Rock Island",
+      "river": "Columbia",
+      "operator": "Chelan PUD",
+      "expect_passage": true,
+      "has_flow": true,
+      "has_generation": true,
+      "has_flow_generation": true,
+      "flow_source": "cwms_api",
+      "generation_source": "eia923_monthly",
+      "has_temperature": true,
+      "temperature_site": "RIS",
+      "temperature_parameter": "Temp (WQM)",
+      "temperature_from_scroll_case": false,
+      "temperature_from_tailwater": false,
+      "has_fish_passage": true,
+      "usace": {
+        "ok": false,
+        "n_rows": 0,
+        "n_data_rows": 0,
+        "columns": [],
+        "has_gen": false,
+        "has_flow": false,
+        "scraper_parse_ok": false,
+        "file_exists": false,
+        "ragged_header": false,
+        "error": "RuntimeError: Failed to fetch https://www.nwd-wc.usace.army.mil/dd/nwdp/hist_csv/www/ris_202608.csv after 2 attempts: 404 Client Error: Not Found for url: https://www.nwd-wc.usace.army.mil/dd/nwdp/hist_csv/www/ris_"
+      },
+      "cwms": {
+        "ok": true,
+        "n_values": 73,
+        "units": "cfs",
+        "ts_id": "RIS.Flow-Out.Ave.1Hour.1Hour.CBT-REV",
+        "error": null
+      },
+      "eia": {
+        "ok": true,
+        "plant_id": 6200,
+        "n_months": 12,
+        "annual_mwh": 2025294.0,
+        "year": 2024,
+        "error": null
+      },
+      "temperature": {
+        "ok": true,
+        "n_rows": 369,
+        "n_values": 365,
+        "site": "RIS",
+        "parameter": "Temp (WQM)",
+        "from_scroll_case": false,
+        "from_tailwater": false,
+        "attempts": [
+          {
+            "site": "RIS",
+            "parameter": "Temp (WQM)",
+            "n_values": 365,
+            "error": null
+          }
+        ],
+        "error": null
+      },
+      "passage": {
+        "ok": true,
+        "n_rows": 369,
+        "n_values": 337,
+        "total_fish": 62382.0,
+        "mode": "corrected",
+        "error": null
+      }
+    },
+    "RRH": {
+      "name": "Rocky Reach",
+      "river": "Columbia",
+      "operator": "Chelan PUD",
+      "expect_passage": true,
+      "has_flow": true,
+      "has_generation": true,
+      "has_flow_generation": true,
+      "flow_source": "cwms_api",
+      "generation_source": "eia923_monthly",
+      "has_temperature": true,
+      "temperature_site": "RRH",
+      "temperature_parameter": "Temp (WQM)",
+      "temperature_from_scroll_case": false,
+      "temperature_from_tailwater": false,
+      "has_fish_passage": true,
+      "usace": {
+        "ok": false,
+        "n_rows": 0,
+        "n_data_rows": 0,
+        "columns": [],
+        "has_gen": false,
+        "has_flow": false,
+        "scraper_parse_ok": false,
+        "file_exists": false,
+        "ragged_header": false,
+        "error": "RuntimeError: Failed to fetch https://www.nwd-wc.usace.army.mil/dd/nwdp/hist_csv/www/rrh_202608.csv after 2 attempts: 404 Client Error: Not Found for url: https://www.nwd-wc.usace.army.mil/dd/nwdp/hist_csv/www/rrh_"
+      },
+      "cwms": {
+        "ok": true,
+        "n_values": 73,
+        "units": "cfs",
+        "ts_id": "RRH.Flow-Out.Ave.1Hour.1Hour.CBT-REV",
+        "error": null
+      },
+      "eia": {
+        "ok": true,
+        "plant_id": 3883,
+        "n_months": 12,
+        "annual_mwh": 4901113.0,
+        "year": 2024,
+        "error": null
+      },
+      "temperature": {
+        "ok": true,
+        "n_rows": 369,
+        "n_values": 365,
+        "site": "RRH",
+        "parameter": "Temp (WQM)",
+        "from_scroll_case": false,
+        "from_tailwater": false,
+        "attempts": [
+          {
+            "site": "RRH",
+            "parameter": "Temp (WQM)",
+            "n_values": 365,
+            "error": null
+          }
+        ],
+        "error": null
+      },
+      "passage": {
+        "ok": true,
+        "n_rows": 369,
+        "n_values": 337,
+        "total_fish": 48803.0,
+        "mode": "corrected",
+        "error": null
+      }
+    },
+    "WEL": {
+      "name": "Wells",
+      "river": "Columbia",
+      "operator": "Douglas PUD",
+      "expect_passage": true,
+      "has_flow": true,
+      "has_generation": true,
+      "has_flow_generation": true,
+      "flow_source": "cwms_api",
+      "generation_source": "eia923_monthly",
+      "has_temperature": true,
+      "temperature_site": "WEL",
+      "temperature_parameter": "Temp (WQM)",
+      "temperature_from_scroll_case": false,
+      "temperature_from_tailwater": false,
+      "has_fish_passage": true,
+      "usace": {
+        "ok": false,
+        "n_rows": 0,
+        "n_data_rows": 0,
+        "columns": [],
+        "has_gen": false,
+        "has_flow": false,
+        "scraper_parse_ok": false,
+        "file_exists": false,
+        "ragged_header": false,
+        "error": "RuntimeError: Failed to fetch https://www.nwd-wc.usace.army.mil/dd/nwdp/hist_csv/www/wel_202608.csv after 2 attempts: 404 Client Error: Not Found for url: https://www.nwd-wc.usace.army.mil/dd/nwdp/hist_csv/www/wel_"
+      },
+      "cwms": {
+        "ok": true,
+        "n_values": 73,
+        "units": "cfs",
+        "ts_id": "WEL.Flow-Out.Ave.1Hour.1Hour.CBT-REV",
+        "error": null
+      },
+      "eia": {
+        "ok": true,
+        "plant_id": 3886,
+        "n_months": 12,
+        "annual_mwh": 3502380.0,
+        "year": 2024,
+        "error": null
+      },
+      "temperature": {
+        "ok": true,
+        "n_rows": 369,
+        "n_values": 365,
+        "site": "WEL",
+        "parameter": "Temp (WQM)",
+        "from_scroll_case": false,
+        "from_tailwater": false,
+        "attempts": [
+          {
+            "site": "WEL",
+            "parameter": "Temp (WQM)",
+            "n_values": 365,
+            "error": null
+          }
+        ],
+        "error": null
+      },
+      "passage": {
+        "ok": true,
+        "n_rows": 369,
+        "n_values": 199,
+        "total_fish": 30751.0,
+        "mode": "corrected",
+        "error": null
+      }
+    },
+    "GCL": {
+      "name": "Grand Coulee",
+      "river": "Columbia",
+      "operator": "USBR",
+      "expect_passage": false,
+      "has_flow": true,
+      "has_generation": false,
+      "has_flow_generation": false,
+      "flow_source": "cwms_api",
+      "generation_source": null,
+      "has_temperature": true,
+      "temperature_site": "GCL",
+      "temperature_parameter": "Temp (WQM)",
+      "temperature_from_scroll_case": false,
+      "temperature_from_tailwater": false,
+      "has_fish_passage": false,
+      "usace": {
+        "ok": true,
+        "n_rows": 1,
+        "n_data_rows": 0,
+        "columns": [
+          "site",
+          "Date",
+          "FDRW",
+          "FDRW W Temp",
+          "GCGW",
+          "GCGW W Temp",
+          "CHJ",
+          "CHJ W Temp",
+          "% Spill",
+          "Gen",
+          "Gen Flow",
+          "Spill Flow",
+          "Misc Flow",
+          "Total Flow",
+          "FB Elev",
+          "TW Elev",
+          "Head",
+          "FDRW Sensor Depth"
+        ],
+        "has_gen": true,
+        "has_flow": true,
+        "scraper_parse_ok": true,
+        "file_exists": true,
+        "ragged_header": false,
+        "error": null
+      },
+      "cwms": {
+        "ok": true,
+        "n_values": 73,
+        "units": "cfs",
+        "ts_id": "GCL.Flow-Out.Ave.1Hour.1Hour.CBT-REV",
+        "error": null
+      },
+      "eia": {
+        "ok": false,
+        "plant_id": null,
+        "n_months": 0,
+        "annual_mwh": null,
+        "year": 2024,
+        "error": "no EIA plant id mapped for this dam"
+      },
+      "temperature": {
+        "ok": true,
+        "n_rows": 369,
+        "n_values": 361,
+        "site": "GCL",
+        "parameter": "Temp (WQM)",
+        "from_scroll_case": false,
+        "from_tailwater": false,
+        "attempts": [
+          {
+            "site": "GCL",
+            "parameter": "Temp (WQM)",
+            "n_values": 361,
+            "error": null
+          }
+        ],
+        "error": null
+      },
+      "passage": {
+        "ok": false,
+        "n_rows": 0,
+        "n_values": 0,
+        "total_fish": null,
+        "mode": "corrected",
+        "error": "RuntimeError: Failed to fetch data after 3 attempts: Got an HTML page instead of CSV data. Your parameter combination probably didn't match a valid DART query. Generate the link by hand on the DART site instead (se"
+      }
+    },
+    "CHJ": {
+      "name": "Chief Joseph",
+      "river": "Columbia",
+      "operator": "USACE",
+      "expect_passage": false,
+      "has_flow": true,
+      "has_generation": false,
+      "has_flow_generation": false,
+      "flow_source": "cwms_api",
+      "generation_source": null,
+      "has_temperature": true,
+      "temperature_site": "CHJ",
+      "temperature_parameter": "Temp (WQM)",
+      "temperature_from_scroll_case": false,
+      "temperature_from_tailwater": false,
+      "has_fish_passage": false,
+      "usace": {
+        "ok": true,
+        "n_rows": 1,
+        "n_data_rows": 0,
+        "columns": [
+          "site",
+          "Date",
+          "CHJ",
+          "CHJ W Temp",
+          "CHQW",
+          "CHQW W Temp",
+          "WEL",
+          "WEL W Temp",
+          "% Spill",
+          "Gen",
+          "Gen Flow",
+          "Spill Flow",
+          "Misc Flow",
+          "Total Flow",
+          "FB Elev",
+          "TW Elev",
+          "Head",
+          "CHQW Sensor Depth"
+        ],
+        "has_gen": true,
+        "has_flow": true,
+        "scraper_parse_ok": true,
+        "file_exists": true,
+        "ragged_header": false,
+        "error": null
+      },
+      "cwms": {
+        "ok": true,
+        "n_values": 73,
+        "units": "cfs",
+        "ts_id": "CHJ.Flow-Out.Ave.1Hour.1Hour.CBT-REV",
+        "error": null
+      },
+      "eia": {
+        "ok": false,
+        "plant_id": null,
+        "n_months": 0,
+        "annual_mwh": null,
+        "year": 2024,
+        "error": "no EIA plant id mapped for this dam"
+      },
+      "temperature": {
+        "ok": true,
+        "n_rows": 369,
+        "n_values": 365,
+        "site": "CHJ",
+        "parameter": "Temp (WQM)",
+        "from_scroll_case": false,
+        "from_tailwater": false,
+        "attempts": [
+          {
+            "site": "CHJ",
+            "parameter": "Temp (WQM)",
+            "n_values": 365,
+            "error": null
+          }
+        ],
+        "error": null
+      },
+      "passage": {
+        "ok": false,
+        "n_rows": 0,
+        "n_values": 0,
+        "total_fish": null,
+        "mode": "corrected",
+        "error": "RuntimeError: Failed to fetch data after 3 attempts: Got an HTML page instead of CSV data. Your parameter combination probably didn't match a valid DART query. Generate the link by hand on the DART site instead (se"
+      }
+    },
+    "DWR": {
+      "name": "Dworshak",
+      "river": "Clearwater",
+      "operator": "USACE",
+      "expect_passage": false,
+      "has_flow": true,
+      "has_generation": false,
+      "has_flow_generation": false,
+      "flow_source": "cwms_api",
+      "generation_source": null,
+      "has_temperature": true,
+      "temperature_site": "DWQI",
+      "temperature_parameter": "Temp (WQM)",
+      "temperature_from_scroll_case": false,
+      "temperature_from_tailwater": true,
+      "has_fish_passage": false,
+      "usace": {
+        "ok": true,
+        "n_rows": 1,
+        "n_data_rows": 0,
+        "columns": [
+          "site",
+          "Date",
+          "No Forebay",
+          "No Forebay.1",
+          "DWQI",
+          "DWQI W Temp",
+          "PEKI",
+          "PEKI W Temp",
+          "ORFI W Temp",
+          "ORFI Flow",
+          "Spill",
+          "% Spill",
+          "RO1 Flow",
+          "RO2 Flow",
+          "RO3 Flow",
+          "Gen",
+          "Gen Flow",
+          "Misc Flow",
+          "Total Flow",
+          "FB Elev",
+          "TW Elev",
+          "Head",
+          "DWQI Sensor Depth"
+        ],
+        "has_gen": true,
+        "has_flow": true,
+        "scraper_parse_ok": true,
+        "file_exists": true,
+        "ragged_header": false,
+        "error": null
+      },
+      "cwms": {
+        "ok": true,
+        "n_values": 73,
+        "units": "cfs",
+        "ts_id": "DWR.Flow-Out.Ave.1Hour.1Hour.CBT-REV",
+        "error": null
+      },
+      "eia": {
+        "ok": false,
+        "plant_id": null,
+        "n_months": 0,
+        "annual_mwh": null,
+        "year": 2024,
+        "error": "no EIA plant id mapped for this dam"
+      },
+      "temperature": {
+        "ok": true,
+        "n_rows": 369,
+        "n_values": 362,
+        "site": "DWQI",
+        "parameter": "Temp (WQM)",
+        "from_scroll_case": false,
+        "from_tailwater": true,
+        "attempts": [
+          {
+            "site": "DWR",
+            "parameter": "Temp (WQM)",
+            "n_values": 0,
+            "error": "RuntimeError: Failed to fetch data after 3 attempts: Got an HTML page instead of CSV data. Your parameter combination probably didn't match a valid DART query. Generate the l"
+          },
+          {
+            "site": "DWR",
+            "parameter": "Temp (Scroll Case)",
+            "n_values": 0,
+            "error": "RuntimeError: Failed to fetch data after 3 attempts: Got an HTML page instead of CSV data. Your parameter combination probably didn't match a valid DART query. Generate the l"
+          },
+          {
+            "site": "DWQI",
+            "parameter": "Temp (WQM)",
+            "n_values": 362,
+            "error": null
+          }
+        ],
+        "error": "RuntimeError: Failed to fetch data after 3 attempts: Got an HTML page instead of CSV data. Your parameter combination probably didn't match a valid DART query. Generate the l"
+      },
+      "passage": {
+        "ok": false,
+        "n_rows": 0,
+        "n_values": 0,
+        "total_fish": null,
+        "mode": "corrected",
+        "error": "RuntimeError: Failed to fetch data after 3 attempts: Got an HTML page instead of CSV data. Your parameter combination probably didn't match a valid DART query. Generate the link by hand on the DART site instead (se"
+      }
+    },
+    "LIB": {
+      "name": "Libby",
+      "river": "Kootenai",
+      "operator": "USACE",
+      "expect_passage": false,
+      "has_flow": true,
+      "has_generation": false,
+      "has_flow_generation": false,
+      "flow_source": "cwms_api",
+      "generation_source": null,
+      "has_temperature": true,
+      "temperature_site": "LIB",
+      "temperature_parameter": "Temp (WQM)",
+      "temperature_from_scroll_case": false,
+      "temperature_from_tailwater": false,
+      "has_fish_passage": false,
+      "usace": {
+        "ok": true,
+        "n_rows": 1,
+        "n_data_rows": 0,
+        "columns": [
+          "site",
+          "Date",
+          "No Forebay",
+          "No Forebay.1",
+          "LBQM",
+          "LBQM W Temp",
+          "No Downstream",
+          "No Downstream.1",
+          "% Spill",
+          "Gen",
+          "Gen Flow",
+          "Spill Flow",
+          "Misc Flow",
+          "Total Flow",
+          "FB Elev",
+          "TW Elev",
+          "Head",
+          "LBQM Sensor Depth"
+        ],
+        "has_gen": true,
+        "has_flow": true,
+        "scraper_parse_ok": true,
+        "file_exists": true,
+        "ragged_header": false,
+        "error": null
+      },
+      "cwms": {
+        "ok": true,
+        "n_values": 73,
+        "units": "cfs",
+        "ts_id": "LIB.Flow-Out.Ave.1Hour.1Hour.CBT-REV",
+        "error": null
+      },
+      "eia": {
+        "ok": false,
+        "plant_id": null,
+        "n_months": 0,
+        "annual_mwh": null,
+        "year": 2024,
+        "error": "no EIA plant id mapped for this dam"
+      },
+      "temperature": {
+        "ok": true,
+        "n_rows": 369,
+        "n_values": 199,
+        "site": "LIB",
+        "parameter": "Temp (WQM)",
+        "from_scroll_case": false,
+        "from_tailwater": false,
+        "attempts": [
+          {
+            "site": "LIB",
+            "parameter": "Temp (WQM)",
+            "n_values": 199,
+            "error": null
+          }
+        ],
+        "error": null
+      },
+      "passage": {
+        "ok": false,
+        "n_rows": 0,
+        "n_values": 0,
+        "total_fish": null,
+        "mode": "corrected",
+        "error": "RuntimeError: Failed to fetch data after 3 attempts: Got an HTML page instead of CSV data. Your parameter combination probably didn't match a valid DART query. Generate the link by hand on the DART site instead (se"
+      }
+    },
+    "HGH": {
+      "name": "Hungry Horse",
+      "river": "S. Fk. Flathead",
+      "operator": "USBR",
+      "expect_passage": false,
+      "has_flow": true,
+      "has_generation": false,
+      "has_flow_generation": false,
+      "flow_source": "cwms_api",
+      "generation_source": null,
+      "has_temperature": false,
+      "temperature_site": null,
+      "temperature_parameter": null,
+      "temperature_from_scroll_case": false,
+      "temperature_from_tailwater": false,
+      "has_fish_passage": false,
+      "usace": {
+        "ok": false,
+        "n_rows": 0,
+        "n_data_rows": 0,
+        "columns": [],
+        "has_gen": false,
+        "has_flow": false,
+        "scraper_parse_ok": false,
+        "file_exists": false,
+        "ragged_header": false,
+        "error": "RuntimeError: Failed to fetch https://www.nwd-wc.usace.army.mil/dd/nwdp/hist_csv/www/hgh_202608.csv after 2 attempts: 404 Client Error: Not Found for url: https://www.nwd-wc.usace.army.mil/dd/nwdp/hist_csv/www/hgh_"
+      },
+      "cwms": {
+        "ok": true,
+        "n_values": 73,
+        "units": "cfs",
+        "ts_id": "HGH.Flow-Out.Ave.1Hour.1Hour.CBT-REV",
+        "error": null
+      },
+      "eia": {
+        "ok": false,
+        "plant_id": null,
+        "n_months": 0,
+        "annual_mwh": null,
+        "year": 2024,
+        "error": "no EIA plant id mapped for this dam"
+      },
+      "temperature": {
+        "ok": false,
+        "n_rows": 0,
+        "n_values": 0,
+        "site": null,
+        "parameter": null,
+        "from_scroll_case": false,
+        "from_tailwater": false,
+        "attempts": [
+          {
+            "site": "HGH",
+            "parameter": "Temp (WQM)",
+            "n_values": 0,
+            "error": "RuntimeError: Failed to fetch data after 3 attempts: Got an HTML page instead of CSV data. Your parameter combination probably didn't match a valid DART query. Generate the l"
+          },
+          {
+            "site": "HGH",
+            "parameter": "Temp (Scroll Case)",
+            "n_values": 0,
+            "error": "RuntimeError: Failed to fetch data after 3 attempts: Got an HTML page instead of CSV data. Your parameter combination probably didn't match a valid DART query. Generate the l"
+          },
+          {
+            "site": "HGHM",
+            "parameter": "Temp (WQM)",
+            "n_values": 0,
+            "error": "RuntimeError: Failed to fetch data after 3 attempts: Got an HTML page instead of CSV data. Your parameter combination probably didn't match a valid DART query. Generate the l"
+          }
+        ],
+        "error": "RuntimeError: Failed to fetch data after 3 attempts: Got an HTML page instead of CSV data. Your parameter combination probably didn't match a valid DART query. Generate the l"
+      },
+      "passage": {
+        "ok": false,
+        "n_rows": 0,
+        "n_values": 0,
+        "total_fish": null,
+        "mode": "corrected",
+        "error": "RuntimeError: Failed to fetch data after 3 attempts: Got an HTML page instead of CSV data. Your parameter combination probably didn't match a valid DART query. Generate the link by hand on the DART site instead (se"
+      }
+    },
+    "ALF": {
+      "name": "Albeni Falls",
+      "river": "Pend Oreille",
+      "operator": "USACE",
+      "expect_passage": false,
+      "has_flow": true,
+      "has_generation": false,
+      "has_flow_generation": false,
+      "flow_source": "cwms_api",
+      "generation_source": null,
+      "has_temperature": true,
+      "temperature_site": "ALF",
+      "temperature_parameter": "Temp (WQM)",
+      "temperature_from_scroll_case": false,
+      "temperature_from_tailwater": false,
+      "has_fish_passage": false,
+      "usace": {
+        "ok": true,
+        "n_rows": 1,
+        "n_data_rows": 0,
+        "columns": [
+          "site",
+          "Date",
+          "ALFI",
+          "ALFI W Temp",
+          "ALQI",
+          "ALQI W Temp",
+          "No Downstream",
+          "No Downstream.1",
+          "% Spill",
+          "Gen",
+          "Gen Flow",
+          "Spill Flow",
+          "Misc Flow",
+          "Total Flow",
+          "FB Elev",
+          "TW Elev",
+          "Head",
+          "ALQI Sensor Depth"
+        ],
+        "has_gen": true,
+        "has_flow": true,
+        "scraper_parse_ok": true,
+        "file_exists": true,
+        "ragged_header": false,
+        "error": null
+      },
+      "cwms": {
+        "ok": true,
+        "n_values": 73,
+        "units": "cfs",
+        "ts_id": "ALF.Flow-Out.Ave.1Hour.1Hour.CBT-REV",
+        "error": null
+      },
+      "eia": {
+        "ok": false,
+        "plant_id": null,
+        "n_months": 0,
+        "annual_mwh": null,
+        "year": 2024,
+        "error": "no EIA plant id mapped for this dam"
+      },
+      "temperature": {
+        "ok": true,
+        "n_rows": 369,
+        "n_values": 327,
+        "site": "ALF",
+        "parameter": "Temp (WQM)",
+        "from_scroll_case": false,
+        "from_tailwater": false,
+        "attempts": [
+          {
+            "site": "ALF",
+            "parameter": "Temp (WQM)",
+            "n_values": 327,
+            "error": null
+          }
+        ],
+        "error": null
+      },
+      "passage": {
+        "ok": false,
+        "n_rows": 0,
+        "n_values": 0,
+        "total_fish": null,
+        "mode": "corrected",
+        "error": "RuntimeError: Failed to fetch data after 3 attempts: Got an HTML page instead of CSV data. Your parameter combination probably didn't match a valid DART query. Generate the link by hand on the DART site instead (se"
+      }
+    }
+  }
+}

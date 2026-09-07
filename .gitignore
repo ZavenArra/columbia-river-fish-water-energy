@@ -1,0 +1,37 @@
+# --- Python ---------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# --- Raw data and source-file caches --------------------------------------
+# Everything under data/raw/ is re-fetchable by the scrapers, and the EIA
+# caches alone run to ~68 MB (f923_*.zip ~20 MB/year, EIA930_BALANCE_* ~48 MB
+# per half-year). Keep the directory, not its contents.
+data/raw/*
+!data/raw/.gitkeep
+
+# Scraper CLI defaults, if run from the repo root instead of into data/raw/
+/dart_*.csv
+/usace_*.csv
+/bpa_*.csv
+/cwms_*.csv
+/eia923_*.csv
+/eia930_*.csv
+/bpa_streamflow/
+
+# --- Databases the ETL will produce ---------------------------------------
+*.db
+*.sqlite
+*.sqlite3
+
+# --- Streamlit ------------------------------------------------------------
+.streamlit/secrets.toml
+
+# --- Editors / OS ---------------------------------------------------------
+.DS_Store
+.idea/
+.vscode/
+*.swp

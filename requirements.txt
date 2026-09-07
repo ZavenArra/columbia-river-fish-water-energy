@@ -1,0 +1,9 @@
+streamlit
+pandas
+requests
+plotly
+sqlalchemy
+openpyxl
+xlrd
+python-dateutil
+tenacity
