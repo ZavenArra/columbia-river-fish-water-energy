@@ -2,6 +2,10 @@
 """
 Incremental refresh: the last ~60 days for every dam, upserted into data/dams.db.
 
+Deliberately does NOT write the raw cache: the current month is still being
+appended to, and caching a partial month would make a later backfill skip
+fetching the complete one.
+
 Meant to be triggered by hand from the Streamlit app, so it has to finish fast.
 It gets there by running the three hosts concurrently -- DART, USACE and CWMS
 each have their own worker enforcing their own spacing, so no single server sees

@@ -184,15 +184,51 @@ Things the parsers handle that are easy to miss, all confirmed against live data
 - DART elevation is already in feet; each dam's tailwater elevation matches the
   next dam downstream's forebay, which is a useful sanity check on a load
 
+## Dashboard
+
+```bash
+# 1. Load some history (once). Each year is ~15 min for all dams.
+python etl/backfill.py --start-year 2023 --end-year 2024
+
+# 2. Run the app.
+streamlit run app.py
+```
+
+The app **only reads** `data/dams.db`, and opens it with `mode=ro` so a bug in
+the UI cannot corrupt the store. Every write happens in `etl/`.
+
+Sidebar filters: dams (any with flow/generation data, defaulting to the first
+four that have all three measurements), years, and species. The species filter
+hides itself when no selected dam has passage data.
+
+Each dam gets three charts against ISO week — generation vs. passage,
+temperature vs. passage, and generation vs. temperature. With several years
+selected you get one line per year per measure: **colour identifies the year,
+line style identifies the measure** (solid = left axis, dotted = right), so
+neither depends on colour alone. Year colours come from a fixed slot order that
+is assigned from every year in the database, so changing the year filter never
+repaints the years that remain. A dam missing one of the three measurements gets
+the affected charts omitted and a short note, not an error.
+
+Each dam also has a **Weekly data** expander with the same numbers as a table —
+two of the light-mode series colours sit below 3:1 contrast against the chart
+surface, so an alternative reading of the values has to exist.
+
+### Refresh button
+
+"Refresh recent data" shells out to `etl/refresh.py --days 60`, shows a spinner
+while it runs (~75 seconds), then calls `st.cache_data.clear()` so every cached
+reader re-queries and the new rows appear. All DB reads are cached with a 300s
+TTL, so switching filters does not re-hit SQLite; the button is what makes new
+data visible before that TTL expires. On failure the database is left untouched
+and the error output is shown in an expander.
+
+The button never writes to the database itself — it runs the ETL script, which
+owns every write.
+
 ## Status
 
-Scrapers, dam validation and the ETL are done. The dashboard is not built yet.
-
-Planned next:
-
-- [ ] `app.py` — Plotly time series with dam/species/date-range filters and
-      overlays of passage against temperature and flow, plus a button that
-      shells out to `etl/refresh.py`.
+Scrapers, dam validation, ETL and the dashboard are done.
 
 ## Setup
 

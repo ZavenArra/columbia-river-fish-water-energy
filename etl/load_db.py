@@ -325,18 +325,95 @@ def _pick(columns, *candidates):
     return None
 
 
+# Unit strings whose values are opaque integer codes, not measurements. These
+# are the strongest alignment anchor a USACE file gives us: a coded column holds
+# something like 10214, never 8.10.
+_CODED_UNITS = {"coded"}
+
+
+def _looks_coded(value: str) -> bool:
+    text = str(value).strip()
+    return text.isdigit() and len(text) >= 4
+
+
+def _alignment_gap(header, units, data_rows):
+    """
+    Find where a USACE data row carries a column its header never names.
+
+    Some months ship more data fields than header fields -- Bonneville's 2026
+    files have 26 data columns against a 25-column header. The extra column is
+    NOT at the end: it sits mid-row, so everything after it shifts by one.
+    Padding the header on the right (the obvious fix) silently reads `Gen PH2`
+    out of the neighbouring `Units` column, turning 145 MW into the code 10214
+    and inflating Bonneville's generation roughly twentyfold.
+
+    Generic type-checking cannot settle this on its own -- nearly every column
+    is numeric, so most candidate positions score alike. Two anchors do settle
+    it: `coded` columns hold opaque integers that never look like measurements,
+    and the file's own arithmetic, Head == FB Elev - TW Elev, holds only at the
+    true alignment. Returns the data index the unnamed column sits at, or None
+    to fall back to padding on the right.
+    """
+    widest = max((len(r) for r in data_rows), default=len(header))
+    if widest - len(header) != 1:
+        return None  # only the single-gap case is inferable
+
+    i_fb = next((j for j, n in enumerate(header)
+                 if n.strip().lower() == "fb elev"), None)
+    i_tw = next((j for j, n in enumerate(header)
+                 if n.strip().lower() in ("tw elev", "tw elev ph1")), None)
+    i_head = next((j for j, n in enumerate(header)
+                   if n.strip().lower() == "head"), None)
+
+    def score(gap):
+        # header[j] reads data[j] before the gap, data[j+1] after it
+        src = [j if j < gap else j + 1 for j in range(len(header))]
+        total = 0
+        for row in data_rows:
+            for j, unit in enumerate(units):
+                k = src[j]
+                if k >= len(row):
+                    continue
+                value = str(row[k]).strip()
+                coded = _looks_coded(value)
+                if unit.strip().lower() in _CODED_UNITS:
+                    total += 3 if coded else -4
+                elif value.lower() in MISSING_TOKENS:
+                    continue
+                else:
+                    try:
+                        float(value)
+                        total += 1
+                    except ValueError:
+                        total -= 3
+            # The decisive anchor: the file's own head arithmetic.
+            if None not in (i_fb, i_tw, i_head):
+                try:
+                    fb = float(row[src[i_fb]])
+                    tw = float(row[src[i_tw]])
+                    head = float(row[src[i_head]])
+                    total += 8 if abs(head - (fb - tw)) <= 0.5 else -8
+                except (ValueError, IndexError):
+                    pass
+        return total
+
+    # gap 0 is impossible: the Date cell always occupies data[0].
+    return max(range(1, len(header) + 1), key=lambda g: (score(g), -g))
+
+
 def parse_usace_month(source, dam_code: str) -> list:
     """
     Parse one monthly USACE water-control CSV.
 
-    Four quirks in these files, all confirmed against live downloads:
+    Quirks in these files, all confirmed against live downloads:
       * row 0 is column names, row 1 is a UNITS row, data starts at row 2
-      * at BON/TDA/JDA/MCN/IHR/LMN the header has FEWER fields than the data
-        rows, so it is padded out to the widest row
+      * some months carry MORE data fields than header fields, with the unnamed
+        column in the MIDDLE of the row -- see _alignment_gap
       * the year lives in the units row's first cell ("LWG 2025"), not in the
         Date column, which only carries "MM/DD HH"
       * the hour runs 1..24, where 24 means midnight ending the day -- i.e.
         00:00 of the following day
+      * "M" means missing
     """
     lines = _usace_lines(source)
     if len(lines) < 3:
@@ -344,8 +421,7 @@ def parse_usace_month(source, dam_code: str) -> list:
 
     header = [c.strip() for c in lines[0].split(",")]
     units_row = [c.strip() for c in lines[1].split(",")]
-    widest = max(len(l.split(",")) for l in lines)
-    padded = header + [f"unnamed_{i}" for i in range(len(header), widest)]
+    data_rows = [[c.strip() for c in l.split(",")] for l in lines[2:]]
 
     # "LWG 2025" -> 2025
     year = None
@@ -355,22 +431,44 @@ def parse_usace_month(source, dam_code: str) -> list:
     if year is None:
         raise ValueError(f"No year in USACE units row: {units_row[0]!r}")
 
-    df = pd.read_csv(io.StringIO("\n".join(lines)), names=padded,
-                     skiprows=2, engine="python")
+    widest = max((len(r) for r in data_rows), default=len(header))
+    if widest > len(header):
+        # Sample rows rather than all ~740: the layout is fixed for the month.
+        gap = _alignment_gap(header, units_row, data_rows[:24])
+        if gap is None:
+            padded = header + [f"unnamed_{i}"
+                               for i in range(len(header), widest)]
+        else:
+            padded = header[:gap] + ["unnamed_gap"] + header[gap:]
+            padded += [f"unnamed_{i}" for i in range(len(padded), widest)]
+    else:
+        padded = list(header)
 
-    date_col = padded[0]
-    c_gen1 = _pick(padded, "Gen", "Gen PH1")
-    c_gen2 = _pick(padded, "Gen PH2")
-    c_gflow1 = _pick(padded, "Gen Flow", "Gen Flow PH1")
-    c_gflow2 = _pick(padded, "Gen Flow PH2")
-    c_spill = _pick(padded, "Spill Flow")
-    c_total = _pick(padded, "Total Flow")
-    c_fb = _pick(padded, "FB Elev")
-    c_tw = _pick(padded, "TW Elev", "TW Elev PH1")  # BON names it PH1
+    index_of = {name: i for i, name in enumerate(padded)}
+
+    def pick(*candidates):
+        norm = {n.strip().lower(): i for n, i in index_of.items()}
+        for cand in candidates:
+            hit = norm.get(cand.strip().lower())
+            if hit is not None:
+                return hit
+        return None
+
+    i_gen1 = pick("Gen", "Gen PH1")
+    i_gen2 = pick("Gen PH2")
+    i_gflow1 = pick("Gen Flow", "Gen Flow PH1")
+    i_gflow2 = pick("Gen Flow PH2")
+    i_spill = pick("Spill Flow")
+    i_total = pick("Total Flow")
+    i_fb = pick("FB Elev")
+    i_tw = pick("TW Elev", "TW Elev PH1")  # BON names it PH1
+
+    def cell(row, idx):
+        return _num(row[idx]) if idx is not None and idx < len(row) else None
 
     rows = []
-    for rec in df.to_dict("records"):
-        stamp = str(rec.get(date_col, "")).strip()
+    for row in data_rows:
+        stamp = row[0] if row else ""
         if not stamp or "/" not in stamp:
             continue
         try:
@@ -387,10 +485,8 @@ def parse_usace_month(source, dam_code: str) -> list:
         else:
             moment += timedelta(hours=hour)
 
-        gen1 = _num(rec.get(c_gen1)) if c_gen1 else None
-        gen2 = _num(rec.get(c_gen2)) if c_gen2 else None
-        gf1 = _num(rec.get(c_gflow1)) if c_gflow1 else None
-        gf2 = _num(rec.get(c_gflow2)) if c_gflow2 else None
+        gen1, gen2 = cell(row, i_gen1), cell(row, i_gen2)
+        gf1, gf2 = cell(row, i_gflow1), cell(row, i_gflow2)
 
         rows.append((
             moment.strftime("%Y-%m-%d %H:00"),
@@ -399,10 +495,10 @@ def parse_usace_month(source, dam_code: str) -> list:
             gen1, gen2,
             _sum_present(gf1, gf2),        # gen_flow_kcfs
             gf1, gf2,
-            _num(rec.get(c_spill)) if c_spill else None,
-            _num(rec.get(c_total)) if c_total else None,
-            _num(rec.get(c_fb)) if c_fb else None,
-            _num(rec.get(c_tw)) if c_tw else None,
+            cell(row, i_spill),
+            cell(row, i_total),
+            cell(row, i_fb),
+            cell(row, i_tw),
             "usace_hist_csv",
         ))
     return rows

@@ -27,6 +27,8 @@ data/*.log
 
 # --- Databases the ETL will produce ---------------------------------------
 *.db
+*.db-wal
+*.db-shm
 *.sqlite
 *.sqlite3
 
