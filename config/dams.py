@@ -159,3 +159,23 @@ TAILWATER_SITE = {
     "DWR": "DWQI",
     "HGH": "HGHM",
 }
+
+# DART abbreviates species in the `parameter` column of its passage CSV. Map
+# those abbreviations back to the names used in SPECIES_CODES / the database.
+# Confirmed against a live all-species query at Bonneville.
+DART_LABEL_TO_SPECIES = {
+    "Chin": "Chinook",
+    "JChin": "Jack-Chinook",
+    "Coho": "Coho",
+    "JCoho": "Jack-Coho",
+    "Sock": "Sockeye",
+    "Stlhd": "Steelhead",
+    "WStlhd": "Steelhead-Wild",
+    "BTrout": "Bull Trout",
+    "Lmpry": "Lamprey (daytime)",
+    "LmpryNight": "Lamprey Nighttime",
+    "LmpryLPS": "Lamprey LPS",
+    "Shad": "Shad",
+    "Chum": "Chum",
+    "Pink": "Pink",
+}

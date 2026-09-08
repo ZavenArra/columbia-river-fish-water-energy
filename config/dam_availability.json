@@ -24,6 +24,10 @@
       "temperature_from_scroll_case": false,
       "temperature_from_tailwater": false,
       "has_fish_passage": true,
+      "has_elevation": true,
+      "elevation_site": "BON",
+      "has_tailwater_elevation": true,
+      "tailwater_elevation_site": "WRNO",
       "usace": {
         "ok": true,
         "n_rows": 744,
@@ -62,6 +66,22 @@
         "file_exists": true,
         "ragged_header": true,
         "error": "RuntimeError: Failed to fetch https://www.nwd-wc.usace.army.mil/dd/nwdp/hist_csv/www/bon_202608.csv after 2 attempts: Error tokenizing data. C error: Expected 25 fields in line 3, saw 26\n"
+      },
+      "elevation": {
+        "forebay": {
+          "ok": true,
+          "site": "BON",
+          "n_values": 365,
+          "mean_ft": 74.1,
+          "error": null
+        },
+        "tailwater": {
+          "ok": true,
+          "site": "WRNO",
+          "n_values": 364,
+          "mean_ft": 13.3,
+          "error": null
+        }
       },
       "cwms": null,
       "eia": null,
@@ -108,6 +128,10 @@
       "temperature_from_scroll_case": false,
       "temperature_from_tailwater": false,
       "has_fish_passage": true,
+      "has_elevation": true,
+      "elevation_site": "TDA",
+      "has_tailwater_elevation": true,
+      "tailwater_elevation_site": "TDDO",
       "usace": {
         "ok": true,
         "n_rows": 744,
@@ -140,6 +164,22 @@
         "file_exists": true,
         "ragged_header": true,
         "error": "RuntimeError: Failed to fetch https://www.nwd-wc.usace.army.mil/dd/nwdp/hist_csv/www/tda_202608.csv after 2 attempts: Error tokenizing data. C error: Expected 19 fields in line 3, saw 20\n"
+      },
+      "elevation": {
+        "forebay": {
+          "ok": true,
+          "site": "TDA",
+          "n_values": 364,
+          "mean_ft": 158.8,
+          "error": null
+        },
+        "tailwater": {
+          "ok": true,
+          "site": "TDDO",
+          "n_values": 365,
+          "mean_ft": 76.8,
+          "error": null
+        }
       },
       "cwms": null,
       "eia": null,
@@ -186,6 +226,10 @@
       "temperature_from_scroll_case": false,
       "temperature_from_tailwater": false,
       "has_fish_passage": true,
+      "has_elevation": true,
+      "elevation_site": "JDA",
+      "has_tailwater_elevation": true,
+      "tailwater_elevation_site": "JHAW",
       "usace": {
         "ok": true,
         "n_rows": 744,
@@ -219,6 +263,22 @@
         "file_exists": true,
         "ragged_header": true,
         "error": "RuntimeError: Failed to fetch https://www.nwd-wc.usace.army.mil/dd/nwdp/hist_csv/www/jda_202608.csv after 2 attempts: Error tokenizing data. C error: Expected 19 fields in line 3, saw 21\n"
+      },
+      "elevation": {
+        "forebay": {
+          "ok": true,
+          "site": "JDA",
+          "n_values": 365,
+          "mean_ft": 264.8,
+          "error": null
+        },
+        "tailwater": {
+          "ok": true,
+          "site": "JHAW",
+          "n_values": 365,
+          "mean_ft": 160.7,
+          "error": null
+        }
       },
       "cwms": null,
       "eia": null,
@@ -265,6 +325,10 @@
       "temperature_from_scroll_case": false,
       "temperature_from_tailwater": false,
       "has_fish_passage": true,
+      "has_elevation": true,
+      "elevation_site": "MCN",
+      "has_tailwater_elevation": true,
+      "tailwater_elevation_site": "MCPW",
       "usace": {
         "ok": true,
         "n_rows": 744,
@@ -300,6 +364,22 @@
         "file_exists": true,
         "ragged_header": true,
         "error": "RuntimeError: Failed to fetch https://www.nwd-wc.usace.army.mil/dd/nwdp/hist_csv/www/mcn_202608.csv after 2 attempts: Error tokenizing data. C error: Expected 22 fields in line 3, saw 23\n"
+      },
+      "elevation": {
+        "forebay": {
+          "ok": true,
+          "site": "MCN",
+          "n_values": 364,
+          "mean_ft": 338.7,
+          "error": null
+        },
+        "tailwater": {
+          "ok": true,
+          "site": "MCPW",
+          "n_values": 365,
+          "mean_ft": 265.9,
+          "error": null
+        }
       },
       "cwms": null,
       "eia": null,
@@ -346,6 +426,10 @@
       "temperature_from_scroll_case": false,
       "temperature_from_tailwater": false,
       "has_fish_passage": true,
+      "has_elevation": true,
+      "elevation_site": "IHR",
+      "has_tailwater_elevation": true,
+      "tailwater_elevation_site": "IDSW",
       "usace": {
         "ok": true,
         "n_rows": 744,
@@ -379,6 +463,22 @@
         "file_exists": true,
         "ragged_header": true,
         "error": "RuntimeError: Failed to fetch https://www.nwd-wc.usace.army.mil/dd/nwdp/hist_csv/www/ihr_202608.csv after 2 attempts: Error tokenizing data. C error: Expected 20 fields in line 3, saw 21\n"
+      },
+      "elevation": {
+        "forebay": {
+          "ok": true,
+          "site": "IHR",
+          "n_values": 365,
+          "mean_ft": 438.5,
+          "error": null
+        },
+        "tailwater": {
+          "ok": true,
+          "site": "IDSW",
+          "n_values": 365,
+          "mean_ft": 340.9,
+          "error": null
+        }
       },
       "cwms": null,
       "eia": null,
@@ -425,6 +525,10 @@
       "temperature_from_scroll_case": false,
       "temperature_from_tailwater": false,
       "has_fish_passage": true,
+      "has_elevation": true,
+      "elevation_site": "LGS",
+      "has_tailwater_elevation": true,
+      "tailwater_elevation_site": "LGSW",
       "usace": {
         "ok": true,
         "n_rows": 745,
@@ -460,6 +564,22 @@
         "file_exists": true,
         "ragged_header": false,
         "error": null
+      },
+      "elevation": {
+        "forebay": {
+          "ok": true,
+          "site": "LGS",
+          "n_values": 365,
+          "mean_ft": 635.5,
+          "error": null
+        },
+        "tailwater": {
+          "ok": true,
+          "site": "LGSW",
+          "n_values": 365,
+          "mean_ft": 538.6,
+          "error": null
+        }
       },
       "cwms": null,
       "eia": null,
@@ -506,6 +626,10 @@
       "temperature_from_scroll_case": false,
       "temperature_from_tailwater": false,
       "has_fish_passage": true,
+      "has_elevation": true,
+      "elevation_site": "LMN",
+      "has_tailwater_elevation": true,
+      "tailwater_elevation_site": "LMNW",
       "usace": {
         "ok": true,
         "n_rows": 744,
@@ -539,6 +663,22 @@
         "file_exists": true,
         "ragged_header": true,
         "error": "RuntimeError: Failed to fetch https://www.nwd-wc.usace.army.mil/dd/nwdp/hist_csv/www/lmn_202608.csv after 2 attempts: Error tokenizing data. C error: Expected 20 fields in line 3, saw 21\n"
+      },
+      "elevation": {
+        "forebay": {
+          "ok": true,
+          "site": "LMN",
+          "n_values": 365,
+          "mean_ft": 538.4,
+          "error": null
+        },
+        "tailwater": {
+          "ok": true,
+          "site": "LMNW",
+          "n_values": 365,
+          "mean_ft": 439.0,
+          "error": null
+        }
       },
       "cwms": null,
       "eia": null,
@@ -585,6 +725,10 @@
       "temperature_from_scroll_case": false,
       "temperature_from_tailwater": false,
       "has_fish_passage": true,
+      "has_elevation": true,
+      "elevation_site": "LWG",
+      "has_tailwater_elevation": true,
+      "tailwater_elevation_site": "LGNW",
       "usace": {
         "ok": true,
         "n_rows": 745,
@@ -618,6 +762,22 @@
         "file_exists": true,
         "ragged_header": false,
         "error": null
+      },
+      "elevation": {
+        "forebay": {
+          "ok": true,
+          "site": "LWG",
+          "n_values": 365,
+          "mean_ft": 735.0,
+          "error": null
+        },
+        "tailwater": {
+          "ok": true,
+          "site": "LGNW",
+          "n_values": 365,
+          "mean_ft": 635.2,
+          "error": null
+        }
       },
       "cwms": null,
       "eia": null,
@@ -664,6 +824,10 @@
       "temperature_from_scroll_case": false,
       "temperature_from_tailwater": false,
       "has_fish_passage": true,
+      "has_elevation": true,
+      "elevation_site": "PRD",
+      "has_tailwater_elevation": true,
+      "tailwater_elevation_site": "PRXW",
       "usace": {
         "ok": false,
         "n_rows": 0,
@@ -675,6 +839,22 @@
         "file_exists": false,
         "ragged_header": false,
         "error": "RuntimeError: Failed to fetch https://www.nwd-wc.usace.army.mil/dd/nwdp/hist_csv/www/prd_202608.csv after 2 attempts: 404 Client Error: Not Found for url: https://www.nwd-wc.usace.army.mil/dd/nwdp/hist_csv/www/prd_"
+      },
+      "elevation": {
+        "forebay": {
+          "ok": true,
+          "site": "PRD",
+          "n_values": 365,
+          "mean_ft": 485.6,
+          "error": null
+        },
+        "tailwater": {
+          "ok": true,
+          "site": "PRXW",
+          "n_values": 365,
+          "mean_ft": 407.7,
+          "error": null
+        }
       },
       "cwms": {
         "ok": true,
@@ -734,6 +914,10 @@
       "temperature_from_scroll_case": false,
       "temperature_from_tailwater": false,
       "has_fish_passage": true,
+      "has_elevation": true,
+      "elevation_site": "WAN",
+      "has_tailwater_elevation": true,
+      "tailwater_elevation_site": "WANW",
       "usace": {
         "ok": false,
         "n_rows": 0,
@@ -745,6 +929,22 @@
         "file_exists": false,
         "ragged_header": false,
         "error": "RuntimeError: Failed to fetch https://www.nwd-wc.usace.army.mil/dd/nwdp/hist_csv/www/wan_202608.csv after 2 attempts: 404 Client Error: Not Found for url: https://www.nwd-wc.usace.army.mil/dd/nwdp/hist_csv/www/wan_"
+      },
+      "elevation": {
+        "forebay": {
+          "ok": true,
+          "site": "WAN",
+          "n_values": 365,
+          "mean_ft": 568.6,
+          "error": null
+        },
+        "tailwater": {
+          "ok": true,
+          "site": "WANW",
+          "n_values": 365,
+          "mean_ft": 489.6,
+          "error": null
+        }
       },
       "cwms": {
         "ok": true,
@@ -804,6 +1004,10 @@
       "temperature_from_scroll_case": false,
       "temperature_from_tailwater": false,
       "has_fish_passage": true,
+      "has_elevation": true,
+      "elevation_site": "RIS",
+      "has_tailwater_elevation": true,
+      "tailwater_elevation_site": "RIGW",
       "usace": {
         "ok": false,
         "n_rows": 0,
@@ -815,6 +1019,22 @@
         "file_exists": false,
         "ragged_header": false,
         "error": "RuntimeError: Failed to fetch https://www.nwd-wc.usace.army.mil/dd/nwdp/hist_csv/www/ris_202608.csv after 2 attempts: 404 Client Error: Not Found for url: https://www.nwd-wc.usace.army.mil/dd/nwdp/hist_csv/www/ris_"
+      },
+      "elevation": {
+        "forebay": {
+          "ok": true,
+          "site": "RIS",
+          "n_values": 365,
+          "mean_ft": 611.9,
+          "error": null
+        },
+        "tailwater": {
+          "ok": true,
+          "site": "RIGW",
+          "n_values": 364,
+          "mean_ft": 570.5,
+          "error": null
+        }
       },
       "cwms": {
         "ok": true,
@@ -874,6 +1094,10 @@
       "temperature_from_scroll_case": false,
       "temperature_from_tailwater": false,
       "has_fish_passage": true,
+      "has_elevation": true,
+      "elevation_site": "RRH",
+      "has_tailwater_elevation": true,
+      "tailwater_elevation_site": "RRDW",
       "usace": {
         "ok": false,
         "n_rows": 0,
@@ -885,6 +1109,22 @@
         "file_exists": false,
         "ragged_header": false,
         "error": "RuntimeError: Failed to fetch https://www.nwd-wc.usace.army.mil/dd/nwdp/hist_csv/www/rrh_202608.csv after 2 attempts: 404 Client Error: Not Found for url: https://www.nwd-wc.usace.army.mil/dd/nwdp/hist_csv/www/rrh_"
+      },
+      "elevation": {
+        "forebay": {
+          "ok": true,
+          "site": "RRH",
+          "n_values": 365,
+          "mean_ft": 705.5,
+          "error": null
+        },
+        "tailwater": {
+          "ok": true,
+          "site": "RRDW",
+          "n_values": 365,
+          "mean_ft": 615.9,
+          "error": null
+        }
       },
       "cwms": {
         "ok": true,
@@ -944,6 +1184,10 @@
       "temperature_from_scroll_case": false,
       "temperature_from_tailwater": false,
       "has_fish_passage": true,
+      "has_elevation": true,
+      "elevation_site": "WEL",
+      "has_tailwater_elevation": true,
+      "tailwater_elevation_site": "WELW",
       "usace": {
         "ok": false,
         "n_rows": 0,
@@ -955,6 +1199,22 @@
         "file_exists": false,
         "ragged_header": false,
         "error": "RuntimeError: Failed to fetch https://www.nwd-wc.usace.army.mil/dd/nwdp/hist_csv/www/wel_202608.csv after 2 attempts: 404 Client Error: Not Found for url: https://www.nwd-wc.usace.army.mil/dd/nwdp/hist_csv/www/wel_"
+      },
+      "elevation": {
+        "forebay": {
+          "ok": true,
+          "site": "WEL",
+          "n_values": 365,
+          "mean_ft": 778.7,
+          "error": null
+        },
+        "tailwater": {
+          "ok": true,
+          "site": "WELW",
+          "n_values": 365,
+          "mean_ft": 710.2,
+          "error": null
+        }
       },
       "cwms": {
         "ok": true,
@@ -1014,6 +1274,10 @@
       "temperature_from_scroll_case": false,
       "temperature_from_tailwater": false,
       "has_fish_passage": false,
+      "has_elevation": true,
+      "elevation_site": "GCL",
+      "has_tailwater_elevation": true,
+      "tailwater_elevation_site": "GCGW",
       "usace": {
         "ok": true,
         "n_rows": 1,
@@ -1044,6 +1308,22 @@
         "file_exists": true,
         "ragged_header": false,
         "error": null
+      },
+      "elevation": {
+        "forebay": {
+          "ok": true,
+          "site": "GCL",
+          "n_values": 364,
+          "mean_ft": 1281.1,
+          "error": null
+        },
+        "tailwater": {
+          "ok": true,
+          "site": "GCGW",
+          "n_values": 365,
+          "mean_ft": 959.5,
+          "error": null
+        }
       },
       "cwms": {
         "ok": true,
@@ -1103,6 +1383,10 @@
       "temperature_from_scroll_case": false,
       "temperature_from_tailwater": false,
       "has_fish_passage": false,
+      "has_elevation": true,
+      "elevation_site": "CHJ",
+      "has_tailwater_elevation": true,
+      "tailwater_elevation_site": "CHQW",
       "usace": {
         "ok": true,
         "n_rows": 1,
@@ -1133,6 +1417,22 @@
         "file_exists": true,
         "ragged_header": false,
         "error": null
+      },
+      "elevation": {
+        "forebay": {
+          "ok": true,
+          "site": "CHJ",
+          "n_values": 364,
+          "mean_ft": 953.0,
+          "error": null
+        },
+        "tailwater": {
+          "ok": true,
+          "site": "CHQW",
+          "n_values": 365,
+          "mean_ft": 781.0,
+          "error": null
+        }
       },
       "cwms": {
         "ok": true,
@@ -1192,6 +1492,10 @@
       "temperature_from_scroll_case": false,
       "temperature_from_tailwater": true,
       "has_fish_passage": false,
+      "has_elevation": true,
+      "elevation_site": "DWR",
+      "has_tailwater_elevation": true,
+      "tailwater_elevation_site": "DWQI",
       "usace": {
         "ok": true,
         "n_rows": 1,
@@ -1227,6 +1531,22 @@
         "file_exists": true,
         "ragged_header": false,
         "error": null
+      },
+      "elevation": {
+        "forebay": {
+          "ok": true,
+          "site": "DWR",
+          "n_values": 363,
+          "mean_ft": 1544.0,
+          "error": null
+        },
+        "tailwater": {
+          "ok": true,
+          "site": "DWQI",
+          "n_values": 363,
+          "mean_ft": 973.0,
+          "error": null
+        }
       },
       "cwms": {
         "ok": true,
@@ -1298,6 +1618,10 @@
       "temperature_from_scroll_case": false,
       "temperature_from_tailwater": false,
       "has_fish_passage": false,
+      "has_elevation": true,
+      "elevation_site": "LIB",
+      "has_tailwater_elevation": false,
+      "tailwater_elevation_site": null,
       "usace": {
         "ok": true,
         "n_rows": 1,
@@ -1328,6 +1652,22 @@
         "file_exists": true,
         "ragged_header": false,
         "error": null
+      },
+      "elevation": {
+        "forebay": {
+          "ok": true,
+          "site": "LIB",
+          "n_values": 365,
+          "mean_ft": 2429.1,
+          "error": null
+        },
+        "tailwater": {
+          "ok": false,
+          "site": null,
+          "n_values": 0,
+          "mean_ft": null,
+          "error": null
+        }
       },
       "cwms": {
         "ok": true,
@@ -1387,6 +1727,10 @@
       "temperature_from_scroll_case": false,
       "temperature_from_tailwater": false,
       "has_fish_passage": false,
+      "has_elevation": true,
+      "elevation_site": "HGH",
+      "has_tailwater_elevation": false,
+      "tailwater_elevation_site": "HGHM",
       "usace": {
         "ok": false,
         "n_rows": 0,
@@ -1398,6 +1742,22 @@
         "file_exists": false,
         "ragged_header": false,
         "error": "RuntimeError: Failed to fetch https://www.nwd-wc.usace.army.mil/dd/nwdp/hist_csv/www/hgh_202608.csv after 2 attempts: 404 Client Error: Not Found for url: https://www.nwd-wc.usace.army.mil/dd/nwdp/hist_csv/www/hgh_"
+      },
+      "elevation": {
+        "forebay": {
+          "ok": true,
+          "site": "HGH",
+          "n_values": 365,
+          "mean_ft": 3537.5,
+          "error": null
+        },
+        "tailwater": {
+          "ok": false,
+          "site": "HGHM",
+          "n_values": 0,
+          "mean_ft": null,
+          "error": "RuntimeError: Failed to fetch data after 3 attempts: Got an HTML page instead of CSV data. Your parameter combination probably didn't match a valid DART query. Generate the l"
+        }
       },
       "cwms": {
         "ok": true,
@@ -1469,6 +1829,10 @@
       "temperature_from_scroll_case": false,
       "temperature_from_tailwater": false,
       "has_fish_passage": false,
+      "has_elevation": true,
+      "elevation_site": "ALF",
+      "has_tailwater_elevation": false,
+      "tailwater_elevation_site": null,
       "usace": {
         "ok": true,
         "n_rows": 1,
@@ -1499,6 +1863,22 @@
         "file_exists": true,
         "ragged_header": false,
         "error": null
+      },
+      "elevation": {
+        "forebay": {
+          "ok": true,
+          "site": "ALF",
+          "n_values": 364,
+          "mean_ft": 2055.6,
+          "error": null
+        },
+        "tailwater": {
+          "ok": false,
+          "site": null,
+          "n_values": 0,
+          "mean_ft": null,
+          "error": null
+        }
       },
       "cwms": {
         "ok": true,

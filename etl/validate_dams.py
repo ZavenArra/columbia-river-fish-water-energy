@@ -195,6 +195,39 @@ def probe_eia_generation(code, year, cache_dir=None):
     return out
 
 
+def probe_elevation(code, year):
+    """
+    Daily pool elevation from DART, forebay and tailwater.
+
+    DART reports elevation in feet at every candidate dam, which is the only
+    source that covers all 19 -- CWMS catalogues Elev-Forebay/Elev-Tailwater but
+    serves them empty, and the USACE monthly files only cover federal projects.
+    The readings are self-consistent down the cascade: each dam's tailwater
+    elevation matches the next dam downstream's forebay.
+    """
+    out = {"forebay": {"ok": False, "site": code.upper(), "n_values": 0,
+                       "mean_ft": None, "error": None},
+           "tailwater": {"ok": False, "site": TAILWATER_SITE.get(code.upper()),
+                         "n_values": 0, "mean_ft": None, "error": None}}
+    for key in ("forebay", "tailwater"):
+        site = out[key]["site"]
+        if not site:
+            continue
+        try:
+            df = dart_scraper.fetch_river_temperature(
+                locations=[site], years=[year], parameter="Elevation",
+                start_mmdd="01/01", end_mmdd="12/31",
+            )
+            n_rows, n_vals, _ = _numeric_summary(df)
+            vals = pd.to_numeric(df["value"], errors="coerce").dropna()
+            out[key].update(ok=n_vals > 0, n_values=n_vals,
+                            mean_ft=round(float(vals.mean()), 1) if len(vals) else None)
+        except Exception as e:  # noqa: BLE001
+            out[key]["error"] = f"{type(e).__name__}: {str(e)[:160]}"
+        time.sleep(0.5)
+    return out
+
+
 def probe_temperature(code, year, params=None):
     """
     Work down a fallback chain and keep the first source that returns numbers:
@@ -318,6 +351,8 @@ def main():
 
         temp = probe_temperature(code, args.dart_year)
         time.sleep(args.delay)
+        elev = probe_elevation(code, args.dart_year)
+        time.sleep(args.delay)
         pas = probe_passage(code, args.dart_year, args.species, args.dart_params)
         time.sleep(args.delay)
 
@@ -340,7 +375,12 @@ def main():
             # True when it came from the tailwater site rather than the dam itself.
             "temperature_from_tailwater": bool(temp.get("from_tailwater")),
             "has_fish_passage": bool(pas["ok"]),
+            "has_elevation": bool(elev["forebay"]["ok"]),
+            "elevation_site": elev["forebay"]["site"],
+            "has_tailwater_elevation": bool(elev["tailwater"]["ok"]),
+            "tailwater_elevation_site": elev["tailwater"]["site"],
             "usace": usace,
+            "elevation": elev,
             "cwms": cwms,
             "eia": eia,
             "temperature": temp,
@@ -357,13 +397,15 @@ def main():
         print(f"flow={'Y' if r['has_flow'] else 'n'} "
               f"gen={'Y' if r['has_generation'] else 'n'} "
               f"temp={tflag} "
+              f"elev={'Y' if r['has_elevation'] else 'n'}"
+              f"{'+tw' if r['has_tailwater_elevation'] else ''} "
               f"passage={'Y' if r['has_fish_passage'] else 'n'}")
 
     # ---- summary table ----
-    print("\n" + "=" * 110)
+    print("\n" + "=" * 122)
     print(f"{'CODE':<6}{'NAME':<20}{'FLOW':>6}{'SOURCE':>17}{'GEN':>5}{'SOURCE':>17}"
-          f"{'TEMP':>6}{'PARAMETER':>25}{'PASS':>6}")
-    print("-" * 110)
+          f"{'TEMP':>6}{'PARAMETER':>25}{'ELEV':>6}{'PASS':>6}")
+    print("-" * 122)
     for code, r in results.items():
         temp_p = r["temperature_parameter"] or ""
         if r["temperature_from_scroll_case"]:
@@ -374,8 +416,9 @@ def main():
               f"{('yes' if r['has_flow'] else 'no'):>6}{(r['flow_source'] or '-'):>17}"
               f"{('yes' if r['has_generation'] else 'no'):>5}{(r['generation_source'] or '-'):>17}"
               f"{('yes' if r['has_temperature'] else 'no'):>6}{temp_p:>25}"
+              f"{(('fb+tw' if r['has_tailwater_elevation'] else 'fb') if r['has_elevation'] else 'no'):>6}"
               f"{('yes' if r['has_fish_passage'] else 'no'):>6}")
-    print("=" * 110)
+    print("=" * 122)
     print("  * scroll-case sensor substituted for the forebay water-quality monitor")
     print("  + tailwater site substituted for the dam's own site")
 

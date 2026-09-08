@@ -20,14 +20,21 @@ Available and populated:
     {LOC}.Flow-Out.Ave.1Hour.1Hour.CBT-REV     total outflow, cfs
     {LOC}.Flow-Gen.Ave.1Hour.1Hour.CBT-REV     flow through turbines, cfs
     {LOC}.Flow-Spill.Ave.1Hour.1Hour.CBT-REV   spill, cfs
-    {LOC}.Elev.Inst.1Hour.0.CBT-REV            forebay elevation, ft
 
-NOT available: generation. {LOC}.Power.Total.1Hour.1Hour.* is listed in
-the CWMS catalog, with extents that claim data from the 1960s to today,
-but the timeseries endpoint returns zero values for every project tried,
-federal and PUD alike (checked BON, LWG, PRD, WEL, both -RAW and -REV).
-The catalog entry exists; the data is not served publicly. For megawatts
-use usace_scraper.py (federal projects) or eia_scraper.py (any plant).
+NOT available, despite being catalogued with decades-long extents:
+    {LOC}.Power.Total.1Hour.1Hour.*            generation, MW
+    {LOC}.Elev-Forebay.Inst.1Hour.0.*          forebay elevation
+    {LOC}.Elev-Tailwater.Inst.1Hour.0.*        tailwater elevation
+The timeseries endpoint returns zero values for all of these, on every
+project tried, federal and PUD alike (checked BON, LWG, PRD, WEL, both
+-RAW and -REV). The catalog entries exist; the data is not served
+publicly. For megawatts use usace_scraper.py (federal projects) or
+eia_scraper.py (any plant). DART carries daily forebay elevation for the
+mid-Columbia dams if you need it (dart_scraper, parameter "Elevation").
+
+PAGINATION: the endpoint caps a response at 500 values and hands back a
+`next-page` cursor. fetch_timeseries follows it to completion -- a naive
+single request silently truncates a year to its first 500 hours.
 
 Series names end in a version: -REV is the reviewed/quality-controlled
 series and is the default here; -RAW is the raw telemetry. GCPUD-RAW
@@ -68,11 +75,19 @@ SERIES = {
     "outflow": "{loc}.Flow-Out.Ave.1Hour.1Hour.CBT-{ver}",
     "gen_flow": "{loc}.Flow-Gen.Ave.1Hour.1Hour.CBT-{ver}",
     "spill": "{loc}.Flow-Spill.Ave.1Hour.1Hour.CBT-{ver}",
-    "elevation": "{loc}.Elev.Inst.1Hour.0.CBT-{ver}",
 }
 
-# Listed in the CWMS catalog but served empty -- see module docstring.
-UNPOPULATED_SERIES = {"power": "{loc}.Power.Total.1Hour.1Hour.CBT-{ver}"}
+# Catalogued with plausible periods of record, but the timeseries endpoint
+# returns zero values for all of them -- see module docstring. Kept here so the
+# names are documented rather than rediscovered as 404s/empties later.
+UNPOPULATED_SERIES = {
+    "power": "{loc}.Power.Total.1Hour.1Hour.CBT-{ver}",
+    "elevation": "{loc}.Elev-Forebay.Inst.1Hour.0.CBT-{ver}",
+    "tw_elevation": "{loc}.Elev-Tailwater.Inst.1Hour.0.CBT-{ver}",
+}
+
+# The API caps a page at 500 values and returns a `next-page` cursor.
+PAGE_SIZE = 5000
 
 
 def _iso(dt) -> str:
@@ -92,20 +107,34 @@ def fetch_timeseries(ts_id: str, begin, end, office: str = OFFICE,
     holds no values for the window, which is how CWMS reports the power
     series. Callers should check `len(df)`, not just for an exception.
     """
-    params = {"office": office, "name": ts_id, "begin": _iso(begin), "end": _iso(end)}
+    base_params = {"office": office, "name": ts_id, "begin": _iso(begin),
+                   "end": _iso(end), "page-size": PAGE_SIZE}
     last_err = None
     for attempt in range(retries):
         try:
-            resp = requests.get(f"{BASE_URL}/timeseries", params=params,
-                                headers=HEADERS, timeout=60)
-            resp.raise_for_status()
-            payload = resp.json()
-            rows = payload.get("values") or []
+            rows, units, cursor, guard = [], None, None, 0
+            while True:
+                params = dict(base_params)
+                if cursor:
+                    params["page"] = cursor
+                resp = requests.get(f"{BASE_URL}/timeseries", params=params,
+                                    headers=HEADERS, timeout=60)
+                resp.raise_for_status()
+                payload = resp.json()
+                page_rows = payload.get("values") or []
+                rows.extend(page_rows)
+                units = units or payload.get("units")
+                cursor = payload.get("next-page")
+                guard += 1
+                # No cursor, an empty page, or an implausible number of pages
+                # all end the walk; the guard stops a malformed cursor looping.
+                if not cursor or not page_rows or guard > 500:
+                    break
             df = pd.DataFrame(rows, columns=["timestamp", "value", "quality"])
             if not df.empty:
                 df["timestamp"] = pd.to_datetime(df["timestamp"], unit="ms", utc=True)
                 df["value"] = pd.to_numeric(df["value"], errors="coerce")
-            df.attrs["units"] = payload.get("units")
+            df.attrs["units"] = units
             df.attrs["ts_id"] = ts_id
             return df
         except Exception as e:  # noqa: BLE001

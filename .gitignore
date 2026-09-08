@@ -22,6 +22,9 @@ data/raw/*
 /eia930_*.csv
 /bpa_streamflow/
 
+# --- ETL run artifacts ----------------------------------------------------
+data/*.log
+
 # --- Databases the ETL will produce ---------------------------------------
 *.db
 *.sqlite
