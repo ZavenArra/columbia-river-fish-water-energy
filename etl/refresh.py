@@ -18,6 +18,12 @@ Period handling per source:
   USACE  the current and previous month, since its files are monthly
   CWMS   one call per series across the whole window
 
+Elevation is included by default but can be dropped with --skip-elevation. It
+costs ~35 extra DART requests (forebay plus tailwater for every dam) and DART is
+the slowest host, so skipping it takes a full run from roughly 75s to 45s. Worth
+skipping when you only want the fast-moving series; the daily pool level rarely
+needs to be as fresh as passage counts or flow.
+
 EIA-923 is deliberately not refreshed: it is monthly, published on a long lag,
 and costs a ~20 MB download, none of which suits an interactive refresh. Use
 `backfill.py` for generation at the PUD dams, or pass --with-eia.
@@ -25,6 +31,7 @@ and costs a ~20 MB download, none of which suits an interactive refresh. Use
 Usage
 -----
   python etl/refresh.py
+  python etl/refresh.py --skip-elevation        # ~45s instead of ~75s
   python etl/refresh.py --days 30 --delay 0.5
 """
 
@@ -94,6 +101,10 @@ def main():
                     help="minimum seconds between requests to the same host")
     ap.add_argument("--db", default=str(load_db.DEFAULT_DB))
     ap.add_argument("--availability", default=str(load_db.DEFAULT_AVAILABILITY))
+    ap.add_argument("--skip-elevation", action="store_true",
+                    help="skip daily forebay/tailwater elevation. Elevation is "
+                         "~35 extra DART requests and DART is the slowest host, "
+                         "so this is the difference between a ~75s and a ~45s run")
     ap.add_argument("--with-eia", action="store_true",
                     help="also refresh EIA-923 monthly generation (slow)")
     ap.add_argument("--log", default=str(REPO / "data" / "etl_refresh.log"))
@@ -114,8 +125,9 @@ def main():
     load_db.init_db(conn)
     before = load_db.table_counts(conn)
 
-    log.info("Refresh %s..%s (%d days) | %d dams | delay %.1fs/host",
-             start_date, end_date, args.days, len(dams), args.delay)
+    log.info("Refresh %s..%s (%d days) | %d dams | delay %.1fs/host%s",
+             start_date, end_date, args.days, len(dams), args.delay,
+             " | elevation skipped" if args.skip_elevation else "")
 
     segments = dart_segments(start_date, end_date)
     months = usace_months(start_date, end_date)
@@ -149,7 +161,7 @@ def main():
                     pending[fut] = (f"{dam} temp {year}", "dart_temperature", dam,
                                     year, meta)
 
-            if "dart_elevation" in sources:
+            if "dart_elevation" in sources and not args.skip_elevation:
                 for location, site in load_db.elevation_sites(meta, dam):
                     for year, s_mmdd, e_mmdd in segments:
                         fut = sched.submit("dart_elevation",

@@ -132,6 +132,11 @@ forebay reading at Bonneville matches the USACE hourly mean to within 0.54 ft.
 All 19 dams have forebay elevation; 16 also have tailwater (LIB, HGH and ALF
 have no tailwater site in DART).
 
+Elevation is the slowest part of a refresh — forebay plus tailwater is ~35 extra
+DART requests, and DART is the busiest host — so `refresh.py --skip-elevation`
+drops it and takes a run from ~75s to ~45s. Pool level moves slowly and rarely
+needs to be as fresh as passage counts or flow. `backfill.py` always includes it.
+
 `generation_monthly` exists because the mid-Columbia PUD dams have no hourly
 generation published anywhere — USACE serves no file and CWMS returns its
 `Power.Total` series empty — so their EIA-923 figures are monthly and cannot
@@ -147,6 +152,7 @@ already written. Re-running any load is a no-op, never a duplicate.
 python etl/backfill.py --start-year 2020 --end-year 2024   # historical
 python etl/backfill.py --start-year 2024 --end-year 2024 --dams BON LWG
 python etl/refresh.py                                      # last 60 days, ~75s
+python etl/refresh.py --skip-elevation                     # drop elevation, ~45s
 python etl/refresh.py --delay 0.5                          # same, ~40s
 ```
 
