@@ -191,6 +191,9 @@ Things the parsers handle that are easy to miss, all confirmed against live data
 
 ## Dashboard
 
+Two pages: **Weekly overview** (several dams and years at once) and **Monthly
+profile** (one dam, one year, in detail).
+
 ```bash
 # 1. Load some history (once). Each year is ~15 min for all dams.
 python etl/backfill.py --start-year 2023 --end-year 2024
@@ -218,6 +221,34 @@ the affected charts omitted and a short note, not an error.
 Each dam also has a **Weekly data** expander with the same numbers as a table —
 two of the light-mode series colours sit below 3:1 contrast against the chart
 surface, so an alternative reading of the values has to exist.
+
+### Monthly profile page
+
+One dam and one year, with three bars per month: fish passage stacked by
+species, generation, and total flow. Flow is stacked into turbine flow, spill
+and "other" (USACE's Misc Flow — locks and ladders) for the dams that publish
+the split, and drawn whole for the CWMS-sourced dams that only publish total
+outflow. Including the remainder is what makes the stack equal the true total
+rather than quietly falling a few percent short.
+
+All three bars are genuine monthly **totals**, so height means "how much in this
+month": fish as a count, generation as MWh, flow as acre-feet. MW and kcfs are
+rates and cannot be summed as-is — summing hourly MW gives MWh directly, and
+hourly kcfs scales to acre-feet.
+
+The three bars sit on **three different y-axes**, so their heights are not
+comparable to each other; only compare a bar with the same bar in other months.
+Each axis is drawn in the colour of the bars it belongs to, and the table below
+the chart carries every exact value.
+
+A month is left blank rather than drawn near-zero when it reported less than 90%
+of its hours — USACE serves some months (Bonneville's May, August and September
+2025) with headers but no data rows, and a stub bar would read as "the dam
+nearly stopped" instead of "we have no data".
+
+Colour: six species take categorical slots 1–6, generation slot 7, flow slot 8 —
+the documented eight-hue cap. The flow bar needs three segments, so rather than
+a ninth hue its parts share one hue and separate by texture.
 
 ### Refresh button
 
