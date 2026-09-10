@@ -208,9 +208,14 @@ def monthly_chart(passage, generation, flow, temperature, *, species_order,
         paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
         font=dict(color=ink["secondary"]),
         hovermode="closest",
-        legend=dict(orientation="h", yanchor="top", y=-0.16, xanchor="left",
+        # Grouped legend entries otherwise bunch against the left edge.
+        # Giving each entry a fixed fraction of the width spreads the four
+        # groups evenly across the area under the chart.
+        legend=dict(orientation="h", yanchor="top", y=-0.15, xanchor="left",
                     x=0, font=dict(size=11), traceorder="grouped",
-                    itemsizing="constant"),
+                    itemsizing="constant", entrywidthmode="fraction",
+                    entrywidth=0.24, tracegroupgap=8,
+                    grouptitlefont=dict(size=12)),
         xaxis=dict(domain=[0.06, 0.86], title_text="Month",
                    # Plotly orders categories by first appearance, so a dam
                    # whose fish data starts in April would put Apr..Nov before
