@@ -35,7 +35,8 @@ import streamlit as st
 
 from viz.axes import _axis_ticks, _nice_dtick
 from viz.data import (load_dam_names, load_dams_with_flow_and_year,
-                      load_global_fish_max, load_monthly_flow,
+                      load_global_fish_max, load_global_temp_range,
+                      load_monthly_flow,
                       load_monthly_generation, load_monthly_passage,
                       load_monthly_temperature, load_species, load_years)
 from dams import MONTHLY_DAM_ORDER
@@ -69,15 +70,23 @@ def _temp_axis_range(t_lo, t_hi, band=TEMP_BAND):
 
     Returns (range, tickvals). The axis is mostly empty space underneath, so
     ticks are listed explicitly rather than generated across the whole range.
+
+    Callers pass the GLOBAL temperature bounds, not this chart's own min and
+    max, so the band occupies the same pixels with the same scale on every dam
+    and year -- a line higher on one chart than another then means warmer
+    water, not a rescaled axis. Bounds are rounded out to multiples of five so
+    the tick labels are stable too.
     """
     if t_lo is None or t_hi is None:
         return None, []
+    t_lo = math.floor(t_lo / 5.0) * 5.0
+    t_hi = math.ceil(t_hi / 5.0) * 5.0
     if t_hi - t_lo < 1e-9:
-        t_lo, t_hi = t_lo - 1.0, t_hi + 1.0
+        t_lo, t_hi = t_lo - 5.0, t_hi + 5.0
     f0, f1 = band
     span = (t_hi - t_lo) / (f1 - f0)
     r0 = t_lo - f0 * span
-    dtick = _nice_dtick(t_lo, t_hi, target=3)
+    dtick = _nice_dtick(t_lo, t_hi, target=4)
     first = math.ceil(t_lo / dtick) * dtick
     ticks = []
     v = first
@@ -89,7 +98,7 @@ def _temp_axis_range(t_lo, t_hi, band=TEMP_BAND):
 
 def monthly_chart(passage, generation, flow, temperature, *, species_order,
                   species_colors, gen_color, flow_ramp, temp_color, mode, title,
-                  fish_max=None, fish_log=False):
+                  fish_max=None, fish_log=False, temp_bounds=None):
     """Grouped bars per month, with the temperature line in a band above them."""
     ink = INK[mode]
     fig = go.Figure()
@@ -167,11 +176,9 @@ def monthly_chart(passage, generation, flow, temperature, *, species_order,
             drew = True
 
     # --- temperature line, in its own band above the bars ----------------
-    temp_range, temp_ticks = None, []
+    # The band is pinned to the global bounds, so it never rescales per chart.
+    temp_range, temp_ticks = _temp_axis_range(*(temp_bounds or (None, None)))
     if temperature is not None and not temperature.empty:
-        t_lo = float(temperature["max_f"].min())
-        t_hi = float(temperature["max_f"].max())
-        temp_range, temp_ticks = _temp_axis_range(t_lo, t_hi)
         fig.add_trace(go.Scatter(
             x=[MONTHS[m - 1] for m in temperature["month"]],
             y=temperature["max_f"], name="Max temperature",
@@ -263,6 +270,8 @@ def monthly_chart(passage, generation, flow, temperature, *, species_order,
                     tickformat="~s"),
     )
 
+    # Drawn whenever bounds exist, even if this dam-year has no readings, so
+    # the axis does not appear and disappear as the selection changes.
     if temp_range:
         fig.update_layout(yaxis4=dict(
             title=dict(text="Max temperature (°F)",
@@ -371,7 +380,8 @@ def render():
                         species_colors=species_colors, gen_color=gen_color,
                         flow_ramp=flow_ramp, temp_color=temp_color, mode=mode,
                         title=f"{label(dam)} — {year}",
-                        fish_max=load_global_fish_max(), fish_log=fish_log)
+                        fish_max=load_global_fish_max(), fish_log=fish_log,
+                        temp_bounds=load_global_temp_range())
     if fig is None:
         st.warning(f"No monthly data for {label(dam)} in {year}.")
         return
