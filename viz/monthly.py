@@ -282,14 +282,22 @@ def render():
         help="Columbia mainstem from the ocean upstream, then the Snake.")
 
     # Colour follows the species as an entity: assigned in fixed order from the
-    # full species list, so filtering never repaints the ones that remain.
+    # full species list, so unchecking one never repaints the rest.
     all_species = load_species()
     species_colors = species_palette(mode, all_species)
+
+    st.sidebar.markdown("**Species**")
+    chosen_species = [sp for sp in all_species
+                      if st.sidebar.checkbox(sp, value=True, key=f"species_{sp}")]
+    if not chosen_species:
+        st.sidebar.caption("No species selected — the fish bar is hidden.")
     gen_color = GENERATION_COLOR["dark" if mode == "dark" else "light"]
     flow_ramp = FLOW_RAMP["dark" if mode == "dark" else "light"]
     temp_color = TEMPERATURE_COLOR["dark" if mode == "dark" else "light"]
 
     passage = load_monthly_passage(dam, year)
+    if not passage.empty:
+        passage = passage[passage["species"].isin(chosen_species)]
     generation = load_monthly_generation(dam, year)
     flow = load_monthly_flow(dam, year)
     temperature = load_monthly_temperature(dam, year)
@@ -316,6 +324,8 @@ def render():
                "single dam and year. Each month shows three bars: fish (stacked "
                "by species), generation, and total flow.")
 
+    # Stack order follows the full species list, not the selection, so a
+    # species keeps its position in the stack regardless of what else is on.
     species_order = [sp for sp in all_species
                      if not passage.empty and sp in set(passage["species"])]
 
