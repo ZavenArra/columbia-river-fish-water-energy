@@ -34,6 +34,7 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from viz.axes import _axis_ticks, _nice_dtick
+from viz.schematic import river_schematic
 from viz.data import (load_dam_names, load_dams_with_flow_and_year,
                       load_global_fish_max, load_global_temp_range,
                       load_monthly_flow,
@@ -228,7 +229,11 @@ def monthly_chart(passage, generation, flow, temperature, *, species_order,
                    font=dict(size=15, color=ink["primary"])),
         barmode="stack",   # traces stack within an offsetgroup, group across
         bargap=0.28, bargroupgap=0.06,
-        height=580, margin=dict(l=132, r=128, t=58, b=124),
+        # Four axes need real room: two stacked on the right and the
+        # temperature scale outside the fish axis on the left. At the width the
+        # app actually renders (narrower than a full-page export) the rotated
+        # axis titles collide without this.
+        height=600, margin=dict(l=148, r=150, t=58, b=124),
         paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
         font=dict(color=ink["secondary"]),
         hovermode="closest",
@@ -240,7 +245,7 @@ def monthly_chart(passage, generation, flow, temperature, *, species_order,
                     itemsizing="constant", entrywidthmode="fraction",
                     entrywidth=0.24, tracegroupgap=8,
                     grouptitlefont=dict(size=12)),
-        xaxis=dict(domain=[0.06, 0.86], title_text="Month",
+        xaxis=dict(domain=[0.055, 0.88], title_text="Month",
                    # Plotly orders categories by first appearance, so a dam
                    # whose fish data starts in April would put Apr..Nov before
                    # Jan..Mar. Pin the calendar order explicitly.
@@ -254,16 +259,16 @@ def monthly_chart(passage, generation, flow, temperature, *, species_order,
                    gridcolor=ink["grid"], zeroline=False, showline=True,
                    linecolor=ink["grid"], tickfont=dict(size=11),
                    tickformat="~s", **fish_axis),
-        yaxis2=dict(title=dict(text="Generation (MWh)",
+        yaxis2=dict(title=dict(text="MWh",
                                font=dict(size=12, color=gen_color)),
                     range=bar_range(gen_top), tick0=0, dtick=gen_dtick,
                     overlaying="y", side="right", showgrid=False,
                     zeroline=False, showline=True, linecolor=gen_color,
                     tickfont=dict(size=11, color=gen_color), tickformat="~s"),
-        yaxis3=dict(title=dict(text="Flow (acre-feet)",
+        yaxis3=dict(title=dict(text="acre-feet",
                                font=dict(size=12, color=flow_ramp["gen_af"])),
                     range=bar_range(flow_top), tick0=0, dtick=flow_dtick,
-                    overlaying="y", side="right", position=0.925, anchor="free",
+                    overlaying="y", side="right", position=0.945, anchor="free",
                     showgrid=False, zeroline=False, showline=True,
                     linecolor=flow_ramp["gen_af"],
                     tickfont=dict(size=11, color=flow_ramp["gen_af"]),
@@ -387,6 +392,17 @@ def render():
         return
 
     st.plotly_chart(fig, width="stretch", key=f"monthly-{dam}-{year}")
+
+    # Below the chart legend: where this dam sits on the system. Dams without
+    # data for the selected year are dashed rather than removed, so the
+    # schematic keeps its shape and the gaps are visible.
+    st.mermaid_chart(river_schematic(dam, available=dam_options, mode=mode),
+                     width="stretch")
+    st.caption(f"{label(dam)} highlighted. Flow runs left to right from the "
+               "Pacific upstream; the Snake joins the Columbia above McNary, so "
+               "fish pass the four lower Columbia dams before the system forks. "
+               "Dashed dams have no data loaded for "
+               f"{year}.")
     if fish_log:
         st.caption(":material/warning: On a log scale the fish bar's stacked "
                    "segments are no longer proportional to their counts — a "
