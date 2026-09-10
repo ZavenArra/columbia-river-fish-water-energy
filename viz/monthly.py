@@ -102,7 +102,16 @@ def monthly_chart(passage, generation, flow, temperature, *, species_order,
             x=[MONTHS[m - 1] for m in generation["month"]],
             y=generation["mwh"], name="Generation",
             legendgroup="gen", legendgrouptitle_text="Generation",
+            # Stippled, not solid. Generation orange sits between the red and
+            # yellow species in hue and cannot clear the colour-separation
+            # floor against both, so the fill carries a second cue and the bar
+            # is not mistaken for the Shad segment beside it. bgcolor must be
+            # set explicitly -- plotly does not fall back to marker.color, and
+            # a pattern with only fgcolor renders white-on-white.
             marker=dict(color=gen_color,
+                        pattern=dict(shape=".", bgcolor=gen_color,
+                                     fgcolor=ink["surface"], size=5,
+                                     solidity=0.32),
                         line=dict(width=0.5, color=ink["surface"])),
             offsetgroup="gen", yaxis="y2",
             hovertemplate="%{x}<br>%{y:,.0f} MWh<extra></extra>",
