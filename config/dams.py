@@ -179,3 +179,31 @@ DART_LABEL_TO_SPECIES = {
     "Chum": "Chum",
     "Pink": "Pink",
 }
+
+
+# ---------------------------------------------------------------------------
+# Geographic order, for the dashboard
+# ---------------------------------------------------------------------------
+# Run-of-river dams with fish ladders, ordered as a fish encounters them:
+# up the Columbia mainstem from the ocean, then up the Snake from its
+# confluence with the Columbia (which is just below McNary).
+#
+# river_mile is measured from each river's own mouth, so the Snake numbers
+# restart at the confluence rather than continuing the Columbia's.
+COLUMBIA_MAINSTEM = ["BON", "TDA", "JDA", "MCN", "PRD", "WAN", "RIS", "RRH", "WEL"]
+SNAKE_MAINSTEM = ["IHR", "LMN", "LGS", "LWG"]
+
+# The dam list the monthly page offers. Storage projects (Grand Coulee, Chief
+# Joseph, Dworshak, Libby, Hungry Horse, Albeni Falls) are deliberately absent:
+# they have no fish ladders, so two of the three measures would always be blank.
+MONTHLY_DAM_ORDER = COLUMBIA_MAINSTEM + SNAKE_MAINSTEM
+
+RIVER_MILE = {
+    "BON": 146, "TDA": 192, "JDA": 216, "MCN": 292,
+    "PRD": 397, "WAN": 415, "RIS": 453, "RRH": 474, "WEL": 516,
+    "IHR": 10, "LMN": 41, "LGS": 70, "LWG": 107,
+}
+
+# Which river each dam sits on, for the schematic.
+RIVER_OF = {**{d: "Columbia" for d in COLUMBIA_MAINSTEM},
+            **{d: "Snake" for d in SNAKE_MAINSTEM}}

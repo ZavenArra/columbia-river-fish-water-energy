@@ -38,6 +38,7 @@ from viz.data import (load_dam_names, load_dams_with_flow_and_year,
                       load_monthly_flow, load_monthly_generation,
                       load_monthly_passage, load_monthly_temperature,
                       load_species, load_years)
+from dams import MONTHLY_DAM_ORDER
 from viz.theme import (FLOW_RAMP, GENERATION_COLOR, INK, TEMPERATURE_COLOR,
                        species_palette, theme_mode)
 
@@ -265,15 +266,20 @@ def render():
         "Year", options=all_years,
         index=all_years.index(default_year) if default_year in all_years else 0)
 
-    dam_options = load_dams_with_flow_and_year(year) or []
+    # Offered in geographic order -- up the Columbia from the ocean, then up
+    # the Snake -- rather than alphabetically, so the list reads as a journey
+    # a fish makes. Storage dams are excluded: no ladder means no passage data.
+    with_data = set(load_dams_with_flow_and_year(year) or [])
+    dam_options = [d for d in MONTHLY_DAM_ORDER if d in with_data]
     if not dam_options:
         st.title("Monthly profile")
-        st.info(f"No dam has flow or generation data for {year}.")
+        st.info(f"No mainstem dam has flow or generation data for {year}.")
         return
     default_dam = "BON" if "BON" in dam_options else dam_options[0]
     dam = st.sidebar.selectbox(
         "Dam", options=dam_options, format_func=label,
-        index=dam_options.index(default_dam))
+        index=dam_options.index(default_dam),
+        help="Columbia mainstem from the ocean upstream, then the Snake.")
 
     # Colour follows the species as an entity: assigned in fixed order from the
     # full species list, so filtering never repaints the ones that remain.
