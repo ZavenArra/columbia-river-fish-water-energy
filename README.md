@@ -246,7 +246,8 @@ of its hours — USACE serves some months (Bonneville's May, August and Septembe
 2025) with headers but no data rows, and a stub bar would read as "the dam
 nearly stopped" instead of "we have no data".
 
-A max-temperature line sits in a band above the bars, in the same window, for
+Bars run generation, flow, fish left to right within each month. A
+max-temperature line sits in a band above the bars, in the same window, for
 whichever months have readings. All three bar axes are pinned to `[0, top/0.72]`
 so they share one baseline — left to itself plotly pads the primary axis below
 zero, which floated the fish bars clear of the other two.
@@ -256,6 +257,24 @@ generation orange, and flow a single blue ramp (light = spilled, blue = through
 turbines, dark = the remainder), because flow segments are parts of one whole
 rather than separate identities. Temperature is aqua, the one hue the page does
 not otherwise spend.
+
+Sidebar controls: year, dam (offered in geographic order up the Columbia then
+up the Snake, mainstem dams only), a checkbox per species, and a log-scale
+toggle for the fish axis. Below the chart is a schematic of the river system
+with the selected dam highlighted and unavailable dams dashed.
+
+**Fixed scales.** The fish axis maximum is the largest monthly total anywhere in
+the database, and the temperature band uses the global temperature range, so
+both are identical on every dam and year — bar heights and line heights mean the
+same thing from chart to chart. The generation and flow axes still scale per
+chart. On the log fish axis the ceiling is scaled in exponent space, keeping the
+tallest bar in the same place and clear of the temperature band; note that
+stacked segments on a log axis are not proportional to their counts, so the
+table is the place to read per-species values.
+
+Generation is stippled so it cannot be mistaken for the red Shad segment beside
+it — orange sits between the red and yellow species in hue and cannot clear the
+colour-separation floor against both.
 
 Species are validated on the **all-pairs** list, not the adjacent one: in a
 stacked bar any two species become neighbours in a month where only those two
