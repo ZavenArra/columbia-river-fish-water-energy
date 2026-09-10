@@ -77,8 +77,11 @@ CREATE INDEX IF NOT EXISTS ix_temperature_dam_date
 CREATE TABLE IF NOT EXISTS flow_generation (
     date_hour          TEXT NOT NULL,   -- 'YYYY-MM-DD HH:00', local Pacific
     dam_code           TEXT NOT NULL,
-    gen_mw             REAL,            -- total plant output
-    gen_mw_ph1         REAL,            -- Bonneville reports two powerhouses
+    -- gen_mw is the project total, taken from USACE's `Gen` column directly.
+    -- The PH columns are its components and sum back to it; PH2 comes from the
+    -- file, PH1 is the remainder. Only Bonneville splits into two powerhouses.
+    gen_mw             REAL,
+    gen_mw_ph1         REAL,
     gen_mw_ph2         REAL,
     gen_flow_kcfs      REAL,
     gen_flow_kcfs_ph1  REAL,
@@ -189,10 +192,28 @@ def _c_to_f(celsius):
     return None if celsius is None else celsius * 9.0 / 5.0 + 32.0
 
 
-def _sum_present(*values):
-    """Sum the non-None values; None if every one of them is missing."""
-    present = [v for v in values if v is not None]
-    return sum(present) if present else None
+def _split_powerhouse(total, ph2):
+    """
+    -> (project_total, powerhouse_1, powerhouse_2)
+
+    USACE's unsuffixed `Gen` / `Gen Flow` columns are the PROJECT TOTAL, and the
+    `PH2` columns are a SUBSET of that total -- powerhouse 2's share -- not a
+    second half to be added on. The file's own flow budget proves it: at
+    Bonneville, Gen Flow 108.4 + Spill 0.0 + Misc 3.5 = Total Flow 111.9
+    exactly, while adding Gen Flow PH2 (101.0) would put generation flow at
+    209 kcfs against a 112 kcfs total, which the river does not carry.
+
+    So powerhouse 1 is the remainder, not a column. Checks out physically:
+    the derived 7.4 kcfs at 63.8 ft of head yields ~36 MW, against a derived
+    37 MW.
+
+    A dam with no PH2 column has one powerhouse, so it takes the whole total.
+    """
+    if total is None:
+        return None, None, None
+    if ph2 is None:
+        return total, total, None
+    return total, total - ph2, ph2
 
 
 def read_csv_text(text: str) -> pd.DataFrame:
@@ -485,16 +506,18 @@ def parse_usace_month(source, dam_code: str) -> list:
         else:
             moment += timedelta(hours=hour)
 
-        gen1, gen2 = cell(row, i_gen1), cell(row, i_gen2)
-        gf1, gf2 = cell(row, i_gflow1), cell(row, i_gflow2)
+        gen_total, gen_ph1, gen_ph2 = _split_powerhouse(
+            cell(row, i_gen1), cell(row, i_gen2))
+        gf_total, gf_ph1, gf_ph2 = _split_powerhouse(
+            cell(row, i_gflow1), cell(row, i_gflow2))
 
         rows.append((
             moment.strftime("%Y-%m-%d %H:00"),
             dam_code.upper(),
-            _sum_present(gen1, gen2),      # gen_mw: both powerhouses
-            gen1, gen2,
-            _sum_present(gf1, gf2),        # gen_flow_kcfs
-            gf1, gf2,
+            gen_total,                     # gen_mw: whole project
+            gen_ph1, gen_ph2,              # components, which sum to it
+            gf_total,
+            gf_ph1, gf_ph2,
             cell(row, i_spill),
             cell(row, i_total),
             cell(row, i_fb),

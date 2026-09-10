@@ -172,9 +172,14 @@ Things the parsers handle that are easy to miss, all confirmed against live data
 
 - USACE row 2 is a **units row**, not data; the hour column runs **1..24**, where
   24 means midnight ending the day
-- Bonneville reports **two powerhouses** — `gen_mw` is their sum, with
-  `gen_mw_ph1`/`gen_mw_ph2` kept. PH1 alone averages 401 MW against a 756 MW
-  total, so ignoring PH2 would understate the dam by nearly half
+- Bonneville reports **two powerhouses**, and the columns are not what their
+  names suggest: `Gen` is the **project total** and `Gen PH2` is a *subset* of
+  it, not a second half to add. `gen_mw` therefore takes `Gen` directly, with
+  `gen_mw_ph2` from the file and `gen_mw_ph1` derived as the remainder, so the
+  components sum back to the total. The file's own flow budget is what settles
+  it: `Gen Flow` + `Spill Flow` + `Misc Flow` = `Total Flow` exactly
+  (108.4 + 0.0 + 3.5 = 111.9 at BON), whereas adding `Gen Flow PH2` would put
+  generation flow at 209 kcfs against a 112 kcfs total
 - DART reports temperature in **Celsius**; stored as `value_f`
 - CWMS reports **cfs** and **UTC**; stored as kcfs on local Pacific time so the
   mid-Columbia dams line up with the federal ones
