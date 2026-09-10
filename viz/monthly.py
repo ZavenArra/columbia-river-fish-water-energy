@@ -94,24 +94,9 @@ def monthly_chart(passage, generation, flow, temperature, *, species_order,
     fig = go.Figure()
     drew = False
 
-    # --- bar 1: fish, stacked by species ---------------------------------
-    if not passage.empty:
-        pivot = passage.pivot_table(index="month", columns="species",
-                                    values="fish", aggfunc="sum").fillna(0)
-        for sp in species_order:
-            if sp not in pivot.columns:
-                continue
-            fig.add_trace(go.Bar(
-                x=[MONTHS[m - 1] for m in pivot.index], y=pivot[sp],
-                name=sp, legendgroup="fish", legendgrouptitle_text="Fish passage",
-                marker=dict(color=species_colors[sp],
-                            line=dict(width=0.5, color=ink["surface"])),
-                offsetgroup="fish", yaxis="y",
-                hovertemplate=f"%{{x}} · {sp}<br>%{{y:,.0f}} fish<extra></extra>",
-            ))
-            drew = True
-
-    # --- bar 2: generation ------------------------------------------------
+    # --- bar 1: generation ------------------------------------------------
+    # Trace order sets the left-to-right order of the bar groups, so these
+    # blocks run generation, flow, fish -- fish last puts it on the right.
     if not generation.empty:
         fig.add_trace(go.Bar(
             x=[MONTHS[m - 1] for m in generation["month"]],
@@ -124,7 +109,7 @@ def monthly_chart(passage, generation, flow, temperature, *, species_order,
         ))
         drew = True
 
-    # --- bar 3: flow, stacked into its parts when the dam reports them ----
+    # --- bar 2: flow, stacked into its parts when the dam reports them ----
     if not flow.empty:
         split = bool(flow.get("has_split", pd.Series([False])).any())
         if split:
@@ -151,6 +136,23 @@ def monthly_chart(passage, generation, flow, temperature, *, species_order,
                             line=dict(width=0.5, color=ink["surface"])),
                 offsetgroup="flow", yaxis="y3",
                 hovertemplate="%{x}<br>%{y:,.0f} acre-ft<extra></extra>",
+            ))
+            drew = True
+
+    # --- bar 3: fish, stacked by species ---------------------------------
+    if not passage.empty:
+        pivot = passage.pivot_table(index="month", columns="species",
+                                    values="fish", aggfunc="sum").fillna(0)
+        for sp in species_order:
+            if sp not in pivot.columns:
+                continue
+            fig.add_trace(go.Bar(
+                x=[MONTHS[m - 1] for m in pivot.index], y=pivot[sp],
+                name=sp, legendgroup="fish", legendgrouptitle_text="Fish passage",
+                marker=dict(color=species_colors[sp],
+                            line=dict(width=0.5, color=ink["surface"])),
+                offsetgroup="fish", yaxis="y",
+                hovertemplate=f"%{{x}} · {sp}<br>%{{y:,.0f}} fish<extra></extra>",
             ))
             drew = True
 
