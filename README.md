@@ -246,9 +246,25 @@ of its hours — USACE serves some months (Bonneville's May, August and Septembe
 2025) with headers but no data rows, and a stub bar would read as "the dam
 nearly stopped" instead of "we have no data".
 
-Colour: six species take categorical slots 1–6, generation slot 7, flow slot 8 —
-the documented eight-hue cap. The flow bar needs three segments, so rather than
-a ninth hue its parts share one hue and separate by texture.
+A max-temperature line sits in a band above the bars, in the same window, for
+whichever months have readings. All three bar axes are pinned to `[0, top/0.72]`
+so they share one baseline — left to itself plotly pads the primary axis below
+zero, which floated the fish bars clear of the other two.
+
+Colour by role: species are pink / green / yellow / red / purple / brown,
+generation orange, and flow a single blue ramp (light = spilled, blue = through
+turbines, dark = the remainder), because flow segments are parts of one whole
+rather than separate identities. Temperature is aqua, the one hue the page does
+not otherwise spend.
+
+Species are validated on the **all-pairs** list, not the adjacent one: in a
+stacked bar any two species become neighbours in a month where only those two
+are present. Light mode clears it (worst normal-vision ΔE 17.3); dark mode
+clears the adjacent list with no warnings but not all-pairs (pink↔red ΔE 7.8),
+as the dark lightness band is too narrow for six hues. Generation orange sits
+between the red and yellow species in hue and cannot clear the normal-vision
+floor against both; it is separated instead by being its own bar in a fixed
+position with its own axis and legend group.
 
 ### Refresh button
 

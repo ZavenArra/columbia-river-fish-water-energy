@@ -27,16 +27,19 @@ the sanctioned way past the cap.
 """
 
 import calendar
+import math
 
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-from viz.axes import _axis_ticks
+from viz.axes import _axis_ticks, _nice_dtick
 from viz.data import (load_dam_names, load_dams_with_flow_and_year,
                       load_monthly_flow, load_monthly_generation,
-                      load_monthly_passage, load_species, load_years)
-from viz.theme import INK, series_colors, theme_mode
+                      load_monthly_passage, load_monthly_temperature,
+                      load_species, load_years)
+from viz.theme import (FLOW_RAMP, GENERATION_COLOR, INK, TEMPERATURE_COLOR,
+                       species_palette, theme_mode)
 
 MONTHS = [calendar.month_abbr[m] for m in range(1, 13)]
 
@@ -46,20 +49,46 @@ MONTHS = [calendar.month_abbr[m] for m in range(1, 13)]
 # "this dam nearly stopped", which is the opposite of "we have no data".
 MIN_COVERAGE = 0.9
 
-# Texture separates the flow bar's parts, so they can share one hue.
-FLOW_PATTERNS = {"gen_af": "", "spill_af": "/", "other_af": "."}
 FLOW_LABELS = {"gen_af": "Through turbines", "spill_af": "Spilled",
                "other_af": "Other (locks, ladders)"}
 
 
-def _bar_axis_titles(mode):
-    ink = INK[mode]
-    return ink
+# The bars occupy the bottom of the plot and the temperature line sits above
+# them, in the same window. Every bar axis is pinned to [0, top / BAR_BAND] so
+# all three share one baseline -- left to itself, plotly pads the primary axis
+# below zero (it ran to -186k on Bonneville) and the fish bars float clear of
+# the others' baseline.
+BAR_BAND = 0.72
+TEMP_BAND = (0.80, 0.985)
 
 
-def monthly_chart(passage, generation, flow, *, species_order, species_colors,
-                  gen_color, flow_color, mode, title):
-    """Grouped bars per month; each group member stacked where it has parts."""
+def _temp_axis_range(t_lo, t_hi, band=TEMP_BAND):
+    """
+    Range that maps [t_lo, t_hi] into the top slice of the plot.
+
+    Returns (range, tickvals). The axis is mostly empty space underneath, so
+    ticks are listed explicitly rather than generated across the whole range.
+    """
+    if t_lo is None or t_hi is None:
+        return None, []
+    if t_hi - t_lo < 1e-9:
+        t_lo, t_hi = t_lo - 1.0, t_hi + 1.0
+    f0, f1 = band
+    span = (t_hi - t_lo) / (f1 - f0)
+    r0 = t_lo - f0 * span
+    dtick = _nice_dtick(t_lo, t_hi, target=3)
+    first = math.ceil(t_lo / dtick) * dtick
+    ticks = []
+    v = first
+    while v <= t_hi + 1e-9:
+        ticks.append(round(v, 6))
+        v += dtick
+    return [r0, r0 + span], ticks
+
+
+def monthly_chart(passage, generation, flow, temperature, *, species_order,
+                  species_colors, gen_color, flow_ramp, temp_color, mode, title):
+    """Grouped bars per month, with the temperature line in a band above them."""
     ink = INK[mode]
     fig = go.Figure()
     drew = False
@@ -105,15 +134,7 @@ def monthly_chart(passage, generation, flow, *, species_order, species_colors,
                     x=[MONTHS[m - 1] for m in flow["month"]], y=flow[col],
                     name=FLOW_LABELS[col], legendgroup="flow",
                     legendgrouptitle_text="Flow",
-                    marker=dict(color=flow_color,
-                                # bgcolor must be set explicitly: plotly does
-                                # not fall back to marker.color, so a pattern
-                                # with only fgcolor renders white-on-white and
-                                # the segment disappears entirely.
-                                pattern=dict(shape=FLOW_PATTERNS[col],
-                                             bgcolor=flow_color,
-                                             fgcolor=ink["surface"], size=6,
-                                             solidity=0.35),
+                    marker=dict(color=flow_ramp[col],
                                 line=dict(width=0.5, color=ink["surface"])),
                     offsetgroup="flow", yaxis="y3",
                     hovertemplate=f"%{{x}} · {FLOW_LABELS[col]}"
@@ -125,18 +146,39 @@ def monthly_chart(passage, generation, flow, *, species_order, species_colors,
                 x=[MONTHS[m - 1] for m in flow["month"]], y=flow["total_af"],
                 name="Total flow", legendgroup="flow",
                 legendgrouptitle_text="Flow",
-                marker=dict(color=flow_color,
+                marker=dict(color=flow_ramp["gen_af"],
                             line=dict(width=0.5, color=ink["surface"])),
                 offsetgroup="flow", yaxis="y3",
                 hovertemplate="%{x}<br>%{y:,.0f} acre-ft<extra></extra>",
             ))
             drew = True
 
+    # --- temperature line, in its own band above the bars ----------------
+    temp_range, temp_ticks = None, []
+    if temperature is not None and not temperature.empty:
+        t_lo = float(temperature["max_f"].min())
+        t_hi = float(temperature["max_f"].max())
+        temp_range, temp_ticks = _temp_axis_range(t_lo, t_hi)
+        fig.add_trace(go.Scatter(
+            x=[MONTHS[m - 1] for m in temperature["month"]],
+            y=temperature["max_f"], name="Max temperature",
+            legendgroup="temp", legendgrouptitle_text="Temperature",
+            mode="lines+markers", yaxis="y4",
+            line=dict(color=temp_color, width=2),
+            marker=dict(size=8, color=temp_color,
+                        line=dict(width=1, color=ink["surface"])),
+            hovertemplate="%{x}<br>max %{y:.1f} °F<extra></extra>",
+        ))
+        drew = True
+
     if not drew:
         return None
 
-    # Stacked totals set each axis's ceiling, so tick intervals come from the
-    # summed height, not the tallest single segment.
+    # Pin every bar axis to [0, top / BAR_BAND]: identical zero for all three,
+    # and headroom left over for the temperature band.
+    def bar_range(top):
+        return [0, (top / BAR_BAND) if top else 1]
+
     fish_top = (passage.groupby("month")["fish"].sum().max()
                 if not passage.empty else 0) or 0
     gen_top = (generation["mwh"].max() if not generation.empty else 0) or 0
@@ -145,21 +187,19 @@ def monthly_chart(passage, generation, flow, *, species_order, species_colors,
     _, gen_dtick = _axis_ticks([(pd.DataFrame({"v": [0, gen_top]}), "v")])
     _, flow_dtick = _axis_ticks([(pd.DataFrame({"v": [0, flow_top]}), "v")])
 
-    # Three y-axes: the plot area is squeezed left to make room for the two
-    # right-hand scales, and each axis wears the colour of its own bars.
     fig.update_layout(
         title=dict(text=title, x=0, xanchor="left", y=0.97, yanchor="top",
                    font=dict(size=15, color=ink["primary"])),
         barmode="stack",   # traces stack within an offsetgroup, group across
         bargap=0.28, bargroupgap=0.06,
-        height=560, margin=dict(l=76, r=128, t=58, b=124),
+        height=580, margin=dict(l=132, r=128, t=58, b=124),
         paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
         font=dict(color=ink["secondary"]),
         hovermode="closest",
         legend=dict(orientation="h", yanchor="top", y=-0.16, xanchor="left",
                     x=0, font=dict(size=11), traceorder="grouped",
                     itemsizing="constant"),
-        xaxis=dict(domain=[0.0, 0.86], title_text="Month",
+        xaxis=dict(domain=[0.06, 0.86], title_text="Month",
                    # Plotly orders categories by first appearance, so a dam
                    # whose fish data starts in April would put Apr..Nov before
                    # Jan..Mar. Pin the calendar order explicitly.
@@ -169,33 +209,45 @@ def monthly_chart(passage, generation, flow, *, species_order, species_colors,
                    title_font=dict(size=12)),
         yaxis=dict(title=dict(text="Fish passage (count)",
                               font=dict(size=12, color=ink["secondary"])),
+                   range=bar_range(fish_top), tick0=0, dtick=fish_dtick,
                    gridcolor=ink["grid"], zeroline=False, showline=True,
                    linecolor=ink["grid"], tickfont=dict(size=11),
-                   rangemode="tozero", tickformat="~s",
-                   tick0=0, dtick=fish_dtick),
+                   tickformat="~s"),
         yaxis2=dict(title=dict(text="Generation (MWh)",
                                font=dict(size=12, color=gen_color)),
+                    range=bar_range(gen_top), tick0=0, dtick=gen_dtick,
                     overlaying="y", side="right", showgrid=False,
                     zeroline=False, showline=True, linecolor=gen_color,
-                    tickfont=dict(size=11, color=gen_color),
-                    rangemode="tozero", tickformat="~s",
-                    tick0=0, dtick=gen_dtick),
+                    tickfont=dict(size=11, color=gen_color), tickformat="~s"),
         yaxis3=dict(title=dict(text="Flow (acre-feet)",
-                               font=dict(size=12, color=flow_color)),
+                               font=dict(size=12, color=flow_ramp["gen_af"])),
+                    range=bar_range(flow_top), tick0=0, dtick=flow_dtick,
                     overlaying="y", side="right", position=0.925, anchor="free",
                     showgrid=False, zeroline=False, showline=True,
-                    linecolor=flow_color,
-                    tickfont=dict(size=11, color=flow_color),
-                    rangemode="tozero", tickformat="~s",
-                    tick0=0, dtick=flow_dtick),
+                    linecolor=flow_ramp["gen_af"],
+                    tickfont=dict(size=11, color=flow_ramp["gen_af"]),
+                    tickformat="~s"),
     )
+
+    if temp_range:
+        fig.update_layout(yaxis4=dict(
+            title=dict(text="Max temperature (°F)",
+                       font=dict(size=12, color=temp_color)),
+            range=temp_range, overlaying="y", side="left", anchor="free",
+            position=0.0, showgrid=False, zeroline=False,
+            # No axis line: it would run the full plot height and imply the
+            # temperature scale extends down through the bars, when the line
+            # only occupies the band at the top. Ticks alone carry the scale.
+            showline=False,
+            linecolor=temp_color, tickmode="array", tickvals=temp_ticks,
+            ticktext=[f"{v:.0f}" for v in temp_ticks],
+            tickfont=dict(size=11, color=temp_color)))
     return fig
 
 
 def render():
     """The monthly profile page."""
     mode = theme_mode()
-    palette = series_colors(mode)
     names = load_dam_names()
     all_years = load_years()
 
@@ -223,17 +275,18 @@ def render():
         "Dam", options=dam_options, format_func=label,
         index=dam_options.index(default_dam))
 
-    # Colour follows the species as an entity: assign slots from the full
-    # species list so filtering never repaints the ones that remain.
+    # Colour follows the species as an entity: assigned in fixed order from the
+    # full species list, so filtering never repaints the ones that remain.
     all_species = load_species()
-    species_colors = {sp: palette[i % len(palette)]
-                      for i, sp in enumerate(all_species)}
-    gen_color = palette[6]
-    flow_color = palette[7]
+    species_colors = species_palette(mode, all_species)
+    gen_color = GENERATION_COLOR["dark" if mode == "dark" else "light"]
+    flow_ramp = FLOW_RAMP["dark" if mode == "dark" else "light"]
+    temp_color = TEMPERATURE_COLOR["dark" if mode == "dark" else "light"]
 
     passage = load_monthly_passage(dam, year)
     generation = load_monthly_generation(dam, year)
     flow = load_monthly_flow(dam, year)
+    temperature = load_monthly_temperature(dam, year)
 
     # Only report gaps up to the last month that has any data at all, so a
     # year still in progress is not described as "missing" its future months.
@@ -260,10 +313,10 @@ def render():
     species_order = [sp for sp in all_species
                      if not passage.empty and sp in set(passage["species"])]
 
-    fig = monthly_chart(passage, generation, flow,
+    fig = monthly_chart(passage, generation, flow, temperature,
                         species_order=species_order,
                         species_colors=species_colors, gen_color=gen_color,
-                        flow_color=flow_color, mode=mode,
+                        flow_ramp=flow_ramp, temp_color=temp_color, mode=mode,
                         title=f"{label(dam)} — {year}")
     if fig is None:
         st.warning(f"No monthly data for {label(dam)} in {year}.")
@@ -272,7 +325,9 @@ def render():
     st.plotly_chart(fig, width="stretch", key=f"monthly-{dam}-{year}")
     st.caption("The three bars use three different y-axes, so their heights are "
                "not comparable to each other — only compare a bar with the same "
-               "bar in other months. Exact values are in the table below.")
+               "bar in other months. All three share one baseline at zero. The "
+               "temperature line has its own scale in the band above the bars. "
+               "Exact values are in the table below.")
 
     if missing:
         st.info(f"No generation or flow bar for "
@@ -292,6 +347,9 @@ def render():
         if not generation.empty:
             table = table.merge(generation[["month", "mwh"]].rename(
                 columns={"mwh": "Generation (MWh)"}), on="month", how="left")
+        if temperature is not None and not temperature.empty:
+            table = table.merge(temperature[["month", "max_f"]].rename(
+                columns={"max_f": "Max temp (°F)"}), on="month", how="left")
         if not flow.empty:
             cols = {"total_af": "Flow total (acre-ft)",
                     "gen_af": "Through turbines", "spill_af": "Spilled",

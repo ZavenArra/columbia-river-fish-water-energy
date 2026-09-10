@@ -275,3 +275,23 @@ def load_dams_with_flow_and_year(year: int) -> list:
             SELECT DISTINCT dam_code FROM flow_generation
             WHERE substr(date_hour, 1, 4) = ? ORDER BY dam_code
         """, conn, params=(str(year),))["dam_code"].tolist()
+
+
+@st.cache_data(ttl=CACHE_TTL)
+def load_monthly_temperature(dam: str, year: int) -> pd.DataFrame:
+    """
+    -> month, max_f, days
+
+    Monthly MAXIMUM water temperature: the warmest daily reading in the month,
+    which is the number that matters for fish, not the average. Months with no
+    readings simply do not appear, so the line breaks rather than interpolating
+    across a gap.
+    """
+    with _connect() as conn:
+        return pd.read_sql_query("""
+            SELECT CAST(substr(date, 6, 2) AS INTEGER) AS month,
+                   MAX(value_f) AS max_f, COUNT(value_f) AS days
+            FROM temperature
+            WHERE dam_code = ? AND substr(date, 1, 4) = ? AND value_f IS NOT NULL
+            GROUP BY month ORDER BY month
+        """, conn, params=(dam, str(year)))
