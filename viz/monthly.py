@@ -89,7 +89,7 @@ def _temp_axis_range(t_lo, t_hi, band=TEMP_BAND):
 
 def monthly_chart(passage, generation, flow, temperature, *, species_order,
                   species_colors, gen_color, flow_ramp, temp_color, mode, title,
-                  fish_max=None):
+                  fish_max=None, fish_log=False):
     """Grouped bars per month, with the temperature line in a band above them."""
     ink = INK[mode]
     fig = go.Figure()
@@ -202,6 +202,20 @@ def monthly_chart(passage, generation, flow, temperature, *, species_order,
     _, gen_dtick = _axis_ticks([(pd.DataFrame({"v": [0, gen_top]}), "v")])
     _, flow_dtick = _axis_ticks([(pd.DataFrame({"v": [0, flow_top]}), "v")])
 
+    # A log fish axis needs its ceiling scaled in EXPONENT space, not value
+    # space: log compresses the top so hard that almost any bar would otherwise
+    # reach the temperature band. Putting log10(global max) at BAR_BAND keeps
+    # the tallest bar exactly where the linear axis puts it, and the ceiling
+    # stays a fixed number so it is still identical across charts.
+    if fish_log:
+        decades = math.log10(max(fish_top, 10.0))
+        fish_axis = dict(type="log", range=[0, decades / BAR_BAND],
+                         tickmode="array",
+                         tickvals=[10 ** k
+                                   for k in range(0, int(math.ceil(decades)) + 1)])
+    else:
+        fish_axis = dict(range=bar_range(fish_top), tick0=0, dtick=fish_dtick)
+
     fig.update_layout(
         title=dict(text=title, x=0, xanchor="left", y=0.97, yanchor="top",
                    font=dict(size=15, color=ink["primary"])),
@@ -227,12 +241,12 @@ def monthly_chart(passage, generation, flow, temperature, *, species_order,
                    gridcolor="rgba(0,0,0,0)", showline=True,
                    linecolor=ink["grid"], tickfont=dict(size=11),
                    title_font=dict(size=12)),
-        yaxis=dict(title=dict(text="Fish passage (count)",
+        yaxis=dict(title=dict(text="Fish passage (count)"
+                                   + (" — log scale" if fish_log else ""),
                               font=dict(size=12, color=ink["secondary"])),
-                   range=bar_range(fish_top), tick0=0, dtick=fish_dtick,
                    gridcolor=ink["grid"], zeroline=False, showline=True,
                    linecolor=ink["grid"], tickfont=dict(size=11),
-                   tickformat="~s"),
+                   tickformat="~s", **fish_axis),
         yaxis2=dict(title=dict(text="Generation (MWh)",
                                font=dict(size=12, color=gen_color)),
                     range=bar_range(gen_top), tick0=0, dtick=gen_dtick,
@@ -310,6 +324,10 @@ def render():
                       if st.sidebar.checkbox(sp, value=True, key=f"species_{sp}")]
     if not chosen_species:
         st.sidebar.caption("No species selected — the fish bar is hidden.")
+    fish_log = st.sidebar.checkbox(
+        "Log scale for fish axis", value=False,
+        help="Shows the smaller species counts. The axis maximum stays the "
+             "same as on the linear scale, so charts remain comparable.")
     gen_color = GENERATION_COLOR["dark" if mode == "dark" else "light"]
     flow_ramp = FLOW_RAMP["dark" if mode == "dark" else "light"]
     temp_color = TEMPERATURE_COLOR["dark" if mode == "dark" else "light"]
@@ -353,12 +371,18 @@ def render():
                         species_colors=species_colors, gen_color=gen_color,
                         flow_ramp=flow_ramp, temp_color=temp_color, mode=mode,
                         title=f"{label(dam)} — {year}",
-                        fish_max=load_global_fish_max())
+                        fish_max=load_global_fish_max(), fish_log=fish_log)
     if fig is None:
         st.warning(f"No monthly data for {label(dam)} in {year}.")
         return
 
     st.plotly_chart(fig, width="stretch", key=f"monthly-{dam}-{year}")
+    if fish_log:
+        st.caption(":material/warning: On a log scale the fish bar's stacked "
+                   "segments are no longer proportional to their counts — a "
+                   "segment's height is the gap between two logarithms, not the "
+                   "value. Read species totals from the table, and use the log "
+                   "scale to see which small species are present at all.")
     st.caption("The three bars use three different y-axes, so their heights are "
                "not comparable to each other — only compare a bar with the same "
                "bar in other months. All three share one baseline at zero. The "
