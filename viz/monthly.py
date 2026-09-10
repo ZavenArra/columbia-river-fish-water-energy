@@ -35,9 +35,9 @@ import streamlit as st
 
 from viz.axes import _axis_ticks, _nice_dtick
 from viz.data import (load_dam_names, load_dams_with_flow_and_year,
-                      load_monthly_flow, load_monthly_generation,
-                      load_monthly_passage, load_monthly_temperature,
-                      load_species, load_years)
+                      load_global_fish_max, load_monthly_flow,
+                      load_monthly_generation, load_monthly_passage,
+                      load_monthly_temperature, load_species, load_years)
 from dams import MONTHLY_DAM_ORDER
 from viz.theme import (FLOW_RAMP, GENERATION_COLOR, INK, TEMPERATURE_COLOR,
                        species_palette, theme_mode)
@@ -88,7 +88,8 @@ def _temp_axis_range(t_lo, t_hi, band=TEMP_BAND):
 
 
 def monthly_chart(passage, generation, flow, temperature, *, species_order,
-                  species_colors, gen_color, flow_ramp, temp_color, mode, title):
+                  species_colors, gen_color, flow_ramp, temp_color, mode, title,
+                  fish_max=None):
     """Grouped bars per month, with the temperature line in a band above them."""
     ink = INK[mode]
     fig = go.Figure()
@@ -191,8 +192,10 @@ def monthly_chart(passage, generation, flow, temperature, *, species_order,
     def bar_range(top):
         return [0, (top / BAR_BAND) if top else 1]
 
-    fish_top = (passage.groupby("month")["fish"].sum().max()
-                if not passage.empty else 0) or 0
+    # The fish ceiling is global, not per-chart: the same maximum on every dam
+    # and year is what lets bar heights be compared between charts at all.
+    fish_top = fish_max or ((passage.groupby("month")["fish"].sum().max()
+                             if not passage.empty else 0) or 0)
     gen_top = (generation["mwh"].max() if not generation.empty else 0) or 0
     flow_top = (flow["total_af"].max() if not flow.empty else 0) or 0
     _, fish_dtick = _axis_ticks([(pd.DataFrame({"v": [0, fish_top]}), "v")])
@@ -349,7 +352,8 @@ def render():
                         species_order=species_order,
                         species_colors=species_colors, gen_color=gen_color,
                         flow_ramp=flow_ramp, temp_color=temp_color, mode=mode,
-                        title=f"{label(dam)} — {year}")
+                        title=f"{label(dam)} — {year}",
+                        fish_max=load_global_fish_max())
     if fig is None:
         st.warning(f"No monthly data for {label(dam)} in {year}.")
         return

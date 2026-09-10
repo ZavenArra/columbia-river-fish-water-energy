@@ -295,3 +295,44 @@ def load_monthly_temperature(dam: str, year: int) -> pd.DataFrame:
             WHERE dam_code = ? AND substr(date, 1, 4) = ? AND value_f IS NOT NULL
             GROUP BY month ORDER BY month
         """, conn, params=(dam, str(year)))
+
+
+@st.cache_data(ttl=CACHE_TTL)
+def load_global_fish_max() -> float:
+    """
+    The largest monthly fish total anywhere in the database.
+
+    Fixes the fish axis so its maximum is identical on every dam and year,
+    which is what makes bar heights comparable between charts. Deliberately
+    computed over ALL species, not the selected ones, so unchecking a species
+    shrinks the bars without moving the axis under them.
+    """
+    with _connect() as conn:
+        row = conn.execute("""
+            SELECT MAX(monthly) FROM (
+                SELECT SUM(count) AS monthly FROM fish_passage
+                WHERE count IS NOT NULL
+                GROUP BY dam_code, substr(date, 1, 4), substr(date, 6, 2))
+        """).fetchone()
+    return float(row[0]) if row and row[0] else 0.0
+
+
+@st.cache_data(ttl=CACHE_TTL)
+def load_global_temp_range() -> tuple:
+    """
+    (min, max) of monthly maximum temperature across every dam and year.
+
+    Pins the temperature band so the line's scale and position never shift
+    between charts; a line higher on one chart than another then genuinely
+    means warmer water.
+    """
+    with _connect() as conn:
+        row = conn.execute("""
+            SELECT MIN(mx), MAX(mx) FROM (
+                SELECT MAX(value_f) AS mx FROM temperature
+                WHERE value_f IS NOT NULL
+                GROUP BY dam_code, substr(date, 1, 4), substr(date, 6, 2))
+        """).fetchone()
+    if not row or row[0] is None:
+        return (32.0, 80.0)
+    return (float(row[0]), float(row[1]))
