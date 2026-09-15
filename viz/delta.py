@@ -21,7 +21,8 @@ import streamlit as st
 
 from dams import MONTHLY_DAM_ORDER
 from viz.axes import (BAR_BAND, FLOW_LABELS, MIN_COVERAGE, MONTHS, _axis_ticks,
-                      _temp_axis_range, shared_zero_ranges)
+                      _temp_axis_range, add_temperature_line,
+                      shared_zero_ranges)
 from viz.data import (load_comparable_years, load_dam_names,
                       load_global_temp_range,
                       load_monthly_flow, load_monthly_generation,
@@ -174,22 +175,30 @@ def delta_chart(fish, gen, flow, temp_cur, temp_prev, *, species_order,
                 hovertemplate=f"%{{x}} · {sp}<br>%{{y:+,.0f}} fish<extra></extra>"))
             drew = True
 
-    # Temperature: both years as levels, not a difference.
+    # Temperature: both years as levels, not a difference, each coloured by
+    # thermal-stress band. The band legend is taken from the target year only;
+    # the previous year gets a single style key, since dash carries the year and
+    # colour carries the band on both lines.
     temp_range, temp_ticks = _temp_axis_range(*(temp_bounds or (None, None)))
-    for frame, label, dash in ((temp_prev, f"{prev_year} max", "dot"),
-                               (temp_cur, f"{year} max", "solid")):
-        if frame is None or frame.empty:
-            continue
-        fig.add_trace(go.Scatter(
-            x=[MONTHS[m - 1] for m in frame["month"]], y=frame["max_f"],
-            name=label, legendgroup="temp",
-            legendgrouptitle_text="Max temperature",
-            mode="lines+markers", yaxis="y4",
-            line=dict(color=temp_color, width=2, dash=dash),
-            marker=dict(size=7, color=temp_color,
-                        line=dict(width=1, color=ink["surface"])),
-            hovertemplate=f"%{{x}} · {label}<br>%{{y:.1f}} °F<extra></extra>"))
-        drew = True
+    if temp_prev is not None and not temp_prev.empty:
+        if add_temperature_line(
+                fig, [MONTHS[m - 1] for m in temp_prev["month"]],
+                list(temp_prev["max_f"]), mode=mode, surface=ink["surface"],
+                dash="dot", show_band_legend=False,
+                hover_label=f"{prev_year} max"):
+            drew = True
+            fig.add_trace(go.Scatter(
+                x=[None], y=[None], mode="lines",
+                name=f"{prev_year} (dotted)", legendgroup="temp",
+                legendgrouptitle_text="Max temperature",
+                line=dict(color=ink["secondary"], width=2, dash="dot"),
+                hoverinfo="skip"))
+    if temp_cur is not None and not temp_cur.empty:
+        if add_temperature_line(
+                fig, [MONTHS[m - 1] for m in temp_cur["month"]],
+                list(temp_cur["max_f"]), mode=mode, surface=ink["surface"],
+                hover_label=f"{year} max"):
+            drew = True
 
     if not drew:
         return None
@@ -253,12 +262,12 @@ def delta_chart(fish, gen, flow, temp_cur, temp_prev, *, species_order,
     if temp_range:
         fig.update_layout(yaxis4=dict(
             title=dict(text="Max temperature (°F)",
-                       font=dict(size=12, color=temp_color)),
+                       font=dict(size=12, color=ink["secondary"])),
             range=temp_range, overlaying="y", side="left", anchor="free",
             position=0.0, showgrid=False, zeroline=False, showline=False,
-            linecolor=temp_color, tickmode="array", tickvals=temp_ticks,
+            linecolor=ink["secondary"], tickmode="array", tickvals=temp_ticks,
             ticktext=[f"{v:.0f}" for v in temp_ticks],
-            tickfont=dict(size=11, color=temp_color)))
+            tickfont=dict(size=11, color=ink["secondary"])))
     return fig
 
 
@@ -388,6 +397,9 @@ def render():
     st.caption(f"{label(dam)} highlighted. Dashed dams have no pair of "
                "consecutive years loaded.")
 
+    st.caption("Temperature line colour marks thermal stress for migrating "
+               "salmon: teal below 68 °F, orange from 68 to 72 °F, red at "
+               "72 °F and above.")
     st.caption("The three bars use three different y-axes, so their heights "
                "are not comparable to each other — but all three share the same "
                "zero line, so whether a bar rises or falls is directly "

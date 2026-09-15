@@ -93,3 +93,70 @@ def species_palette(mode: str, species: list) -> dict:
     table = SPECIES_COLORS["dark" if mode == "dark" else "light"]
     order = SPECIES_COLOR_ORDER
     return {sp: table[order[i % len(order)]] for i, sp in enumerate(species)}
+
+
+# ---------------------------------------------------------------------------
+# Temperature bands
+# ---------------------------------------------------------------------------
+# Water temperature is a STATUS, not another series: 68 F is where thermal
+# stress on migrating salmon sets in and 72 F is where it gets severe. So the
+# line is coloured from the reserved status palette rather than the categorical
+# slots -- those hexes are fixed, never themed, and deliberately kept apart from
+# the series colours so a status never impersonates a series.
+#
+# The status steps sit close to same-hue series colours by design (status-serious
+# is dE 5.8 from the slot-2 orange the generation bar uses; status-critical is
+# 4.8 from the red Shad segment). The documented mitigation is that a status
+# colour never carries meaning alone, so every band is named in the legend and
+# the thresholds are stated in the caption beneath the chart.
+TEMP_BANDS = [
+    (None, 68.0, "cool", "Below 68 °F"),
+    (68.0, 72.0, "serious", "68–72 °F"),
+    (72.0, None, "critical", "72 °F and above"),
+]
+
+TEMP_BAND_COLORS = {
+    # "cool" keeps the page's existing temperature identity; the other two are
+    # the fixed status steps.
+    "cool": {"light": "#1baf7a", "dark": "#199e70"},
+    "serious": {"light": "#ec835a", "dark": "#ec835a"},
+    "critical": {"light": "#d03b3b", "dark": "#d03b3b"},
+}
+
+
+def temp_band(value) -> str:
+    """Which band a temperature falls in."""
+    for lo, hi, name, _ in TEMP_BANDS:
+        if (lo is None or value >= lo) and (hi is None or value < hi):
+            return name
+    return "cool"
+
+
+def temp_band_color(name: str, mode: str) -> str:
+    return TEMP_BAND_COLORS[name]["dark" if mode == "dark" else "light"]
+
+
+def temperature_segments(xs, values):
+    """
+    Split a temperature series into runs that share a band.
+
+    -> [(band_name, xs_run, values_run)]
+
+    Each run after the first repeats the previous point so the line stays
+    unbroken, which means the joining segment takes the colour of the band it
+    is entering. Crossings are not interpolated: these are monthly maxima, so a
+    crossing "somewhere between June and July" would be invented precision.
+    """
+    pairs = [(x, v) for x, v in zip(xs, values) if v is not None and v == v]
+    if not pairs:
+        return []
+    runs, cur_band, cur = [], temp_band(pairs[0][1]), [pairs[0]]
+    for point in pairs[1:]:
+        band = temp_band(point[1])
+        if band == cur_band:
+            cur.append(point)
+        else:
+            runs.append((cur_band, cur))
+            cur_band, cur = band, [cur[-1], point]   # repeat to bridge the gap
+    runs.append((cur_band, cur))
+    return [(band, [p[0] for p in pts], [p[1] for p in pts]) for band, pts in runs]

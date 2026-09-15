@@ -128,3 +128,38 @@ def shared_zero_ranges(extents, band=BAR_BAND):
         hi = lo + span / band          # headroom above for the temperature band
         out[name] = [lo, hi]
     return out
+
+
+def add_temperature_line(fig, xs, values, *, mode, surface, yaxis="y4",
+                         dash="solid", legend_group="temp",
+                         legend_title="Max temperature", show_band_legend=True,
+                         hover_label="max"):
+    """
+    Draw a temperature line coloured by thermal-stress band.
+
+    One trace per run of months sharing a band, so the line changes colour as
+    the water crosses 68 F and 72 F. Each band contributes at most one legend
+    entry, because a status colour must never carry meaning on its own.
+
+    Returns True if anything was drawn.
+    """
+    import plotly.graph_objects as go
+
+    from viz.theme import TEMP_BANDS, temp_band_color, temperature_segments
+
+    labels = {name: label for _, _, name, label in TEMP_BANDS}
+    segments = temperature_segments(xs, values)
+    seen = set()
+    for band, seg_x, seg_y in segments:
+        colour = temp_band_color(band, mode)
+        first = show_band_legend and band not in seen
+        seen.add(band)
+        fig.add_trace(go.Scatter(
+            x=seg_x, y=seg_y, name=labels[band], legendgroup=legend_group,
+            legendgrouptitle_text=legend_title, showlegend=first,
+            mode="lines+markers", yaxis=yaxis,
+            line=dict(color=colour, width=2, dash=dash),
+            marker=dict(size=8, color=colour,
+                        line=dict(width=1, color=surface)),
+            hovertemplate=f"%{{x}}<br>{hover_label} %{{y:.1f}} °F<extra></extra>"))
+    return bool(segments)

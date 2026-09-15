@@ -256,8 +256,19 @@ zero, which floated the fish bars clear of the other two.
 Colour by role: species are pink / green / yellow / red / purple / brown,
 generation orange, and flow a single blue ramp (light = spilled, blue = through
 turbines, dark = the remainder), because flow segments are parts of one whole
-rather than separate identities. Temperature is aqua, the one hue the page does
-not otherwise spend.
+rather than separate identities. Temperature is coloured by **thermal-stress band** rather than as a series:
+teal below 68 °F, orange from 68 to 72 °F, red at 72 °F and above — the points
+where heat stress on migrating salmon sets in and becomes severe. Those two
+warm steps come from the reserved status palette (`#ec835a`, `#d03b3b`), which
+is deliberately kept apart from the series colours so a status never
+impersonates a series. Because the status steps sit close to same-hue series
+colours by design, every band is named in the legend and the thresholds are
+stated in a caption — a status colour never carries meaning alone.
+
+The line is split into one trace per run of months sharing a band, with each
+run repeating the previous point so the line stays unbroken. Crossings are not
+interpolated: these are monthly maxima, so a crossing "somewhere between June
+and July" would be invented precision.
 
 Sidebar controls: year, dam (offered in geographic order up the Columbia then
 up the Snake, mainstem dams only), a checkbox per species, and a log-scale

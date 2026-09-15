@@ -34,7 +34,7 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from viz.axes import (BAR_BAND, FLOW_LABELS, MIN_COVERAGE, MONTHS, _axis_ticks,
-                      _nice_dtick, _temp_axis_range)
+                      _nice_dtick, _temp_axis_range, add_temperature_line)
 from viz.schematic import river_schematic
 from viz.data import (load_dam_names, load_dams_with_flow_and_year,
                       load_global_fish_max, load_global_temp_range,
@@ -128,17 +128,10 @@ def monthly_chart(passage, generation, flow, temperature, *, species_order,
     # The band is pinned to the global bounds, so it never rescales per chart.
     temp_range, temp_ticks = _temp_axis_range(*(temp_bounds or (None, None)))
     if temperature is not None and not temperature.empty:
-        fig.add_trace(go.Scatter(
-            x=[MONTHS[m - 1] for m in temperature["month"]],
-            y=temperature["max_f"], name="Max temperature",
-            legendgroup="temp", legendgrouptitle_text="Temperature",
-            mode="lines+markers", yaxis="y4",
-            line=dict(color=temp_color, width=2),
-            marker=dict(size=8, color=temp_color,
-                        line=dict(width=1, color=ink["surface"])),
-            hovertemplate="%{x}<br>max %{y:.1f} °F<extra></extra>",
-        ))
-        drew = True
+        if add_temperature_line(
+                fig, [MONTHS[m - 1] for m in temperature["month"]],
+                list(temperature["max_f"]), mode=mode, surface=ink["surface"]):
+            drew = True
 
     if not drew:
         return None
@@ -228,16 +221,16 @@ def monthly_chart(passage, generation, flow, temperature, *, species_order,
     if temp_range:
         fig.update_layout(yaxis4=dict(
             title=dict(text="Max temperature (°F)",
-                       font=dict(size=12, color=temp_color)),
+                       font=dict(size=12, color=ink["secondary"])),
             range=temp_range, overlaying="y", side="left", anchor="free",
             position=0.0, showgrid=False, zeroline=False,
             # No axis line: it would run the full plot height and imply the
             # temperature scale extends down through the bars, when the line
             # only occupies the band at the top. Ticks alone carry the scale.
             showline=False,
-            linecolor=temp_color, tickmode="array", tickvals=temp_ticks,
+            linecolor=ink["secondary"], tickmode="array", tickvals=temp_ticks,
             ticktext=[f"{v:.0f}" for v in temp_ticks],
-            tickfont=dict(size=11, color=temp_color)))
+            tickfont=dict(size=11, color=ink["secondary"])))
     return fig
 
 
@@ -376,6 +369,9 @@ def render():
                    "on a log axis a segment's height is the gap between two "
                    "logarithms rather than its count, which would misstate every "
                    "species but the bottom one.")
+    st.caption("Temperature line colour marks thermal stress for migrating "
+               "salmon: teal below 68 °F, orange from 68 to 72 °F, red at "
+               "72 °F and above.")
     st.caption("The three bars use three different y-axes, so their heights are "
                "not comparable to each other — only compare a bar with the same "
                "bar in other months. All three share one baseline at zero. The "
