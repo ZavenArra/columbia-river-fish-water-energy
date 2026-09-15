@@ -336,3 +336,16 @@ def load_global_temp_range() -> tuple:
     if not row or row[0] is None:
         return (32.0, 80.0)
     return (float(row[0]), float(row[1]))
+
+
+@st.cache_data(ttl=CACHE_TTL)
+def load_dam_years(dam: str) -> list:
+    """Years this dam has any flow, generation or passage data for."""
+    with _connect() as conn:
+        rows = pd.read_sql_query("""
+            SELECT DISTINCT substr(date_hour, 1, 4) AS y FROM flow_generation
+            WHERE dam_code = :d
+            UNION
+            SELECT DISTINCT substr(date, 1, 4) FROM fish_passage WHERE dam_code = :d
+        """, conn, params={"d": dam})["y"].dropna().astype(int)
+    return sorted(rows.unique().tolist())

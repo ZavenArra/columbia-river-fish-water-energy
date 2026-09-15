@@ -33,7 +33,8 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-from viz.axes import _axis_ticks, _nice_dtick
+from viz.axes import (BAR_BAND, FLOW_LABELS, MIN_COVERAGE, MONTHS, _axis_ticks,
+                      _nice_dtick, _temp_axis_range)
 from viz.schematic import river_schematic
 from viz.data import (load_dam_names, load_dams_with_flow_and_year,
                       load_global_fish_max, load_global_temp_range,
@@ -43,59 +44,6 @@ from viz.data import (load_dam_names, load_dams_with_flow_and_year,
 from dams import MONTHLY_DAM_ORDER
 from viz.theme import (FLOW_RAMP, GENERATION_COLOR, INK, TEMPERATURE_COLOR,
                        species_palette, theme_mode)
-
-MONTHS = [calendar.month_abbr[m] for m in range(1, 13)]
-
-# A month needs at least this much of its hours reported before its generation
-# or flow bar is drawn. Three of Bonneville's 2025 months return header-only
-# files from USACE; drawing their single stray hour as a bar would read as
-# "this dam nearly stopped", which is the opposite of "we have no data".
-MIN_COVERAGE = 0.9
-
-FLOW_LABELS = {"gen_af": "Through turbines", "spill_af": "Spilled",
-               "other_af": "Other (locks, ladders)"}
-
-
-# The bars occupy the bottom of the plot and the temperature line sits above
-# them, in the same window. Every bar axis is pinned to [0, top / BAR_BAND] so
-# all three share one baseline -- left to itself, plotly pads the primary axis
-# below zero (it ran to -186k on Bonneville) and the fish bars float clear of
-# the others' baseline.
-BAR_BAND = 0.72
-TEMP_BAND = (0.80, 0.985)
-
-
-def _temp_axis_range(t_lo, t_hi, band=TEMP_BAND):
-    """
-    Range that maps [t_lo, t_hi] into the top slice of the plot.
-
-    Returns (range, tickvals). The axis is mostly empty space underneath, so
-    ticks are listed explicitly rather than generated across the whole range.
-
-    Callers pass the GLOBAL temperature bounds, not this chart's own min and
-    max, so the band occupies the same pixels with the same scale on every dam
-    and year -- a line higher on one chart than another then means warmer
-    water, not a rescaled axis. Bounds are rounded out to multiples of five so
-    the tick labels are stable too.
-    """
-    if t_lo is None or t_hi is None:
-        return None, []
-    t_lo = math.floor(t_lo / 5.0) * 5.0
-    t_hi = math.ceil(t_hi / 5.0) * 5.0
-    if t_hi - t_lo < 1e-9:
-        t_lo, t_hi = t_lo - 5.0, t_hi + 5.0
-    f0, f1 = band
-    span = (t_hi - t_lo) / (f1 - f0)
-    r0 = t_lo - f0 * span
-    dtick = _nice_dtick(t_lo, t_hi, target=4)
-    first = math.ceil(t_lo / dtick) * dtick
-    ticks = []
-    v = first
-    while v <= t_hi + 1e-9:
-        ticks.append(round(v, 6))
-        v += dtick
-    return [r0, r0 + span], ticks
-
 
 def monthly_chart(passage, generation, flow, temperature, *, species_order,
                   species_colors, gen_color, flow_ramp, temp_color, mode, title,

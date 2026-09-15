@@ -1,9 +1,10 @@
 """
 Columbia/Snake River Dam Dashboard.
 
-Two pages:
+Three pages:
   Weekly overview  -- each dam's measures against ISO week, one line per year
   Monthly profile  -- one dam, one year, monthly totals as grouped bars
+  Year-over-year   -- one dam, monthly change against the preceding year
 
 Reads data/dams.db and nothing else. Connections are opened read-only
 (mode=ro) so a bug here can never corrupt the store; the one exception is the
@@ -70,6 +71,12 @@ def monthly_page():
     refresh_control()
 
 
+def delta_page():
+    from viz import delta
+    delta.render()
+    refresh_control()
+
+
 def main():
     st.set_page_config(page_title="Columbia/Snake Dam Dashboard", layout="wide")
 
@@ -84,6 +91,7 @@ def main():
     nav = st.navigation([
         st.Page(weekly_page, title="Weekly overview", icon="📈", default=True),
         st.Page(monthly_page, title="Monthly profile", icon="📊"),
+        st.Page(delta_page, title="Year-over-year", icon="📉"),
     ])
     nav.run()
 
