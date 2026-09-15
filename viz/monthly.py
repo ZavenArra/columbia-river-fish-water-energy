@@ -334,14 +334,33 @@ def render():
     species_colors = species_palette(mode, all_species)
 
     st.sidebar.markdown("**Species**")
-    chosen_species = [sp for sp in all_species
-                      if st.sidebar.checkbox(sp, value=True, key=f"species_{sp}")]
-    if not chosen_species:
-        st.sidebar.caption("No species selected — the fish bar is hidden.")
+    checked = [sp for sp in all_species
+               if st.sidebar.checkbox(sp, value=True, key=f"species_{sp}")]
+
     fish_log = st.sidebar.checkbox(
-        "Log scale for fish axis", value=False,
-        help="Shows the smaller species counts. The axis maximum stays the "
-             "same as on the linear scale, so charts remain comparable.")
+        "Log scale for fish axis", value=False, key="fish_log",
+        help="Plots one species against the same axis maximum as the linear "
+             "scale, so a small run is readable next to a three-million shad "
+             "year. One species at a time: a log axis cannot stack.")
+
+    # A log axis cannot carry a stack -- segment heights become gaps between
+    # logarithms rather than counts -- so log mode plots exactly one species.
+    # On the transition INTO log mode, and only then, it takes the first
+    # species currently ticked; after that the choice stays the user's.
+    if fish_log and not st.session_state.get("_fish_log_was_on", False):
+        st.session_state["log_species"] = checked[0] if checked else None
+    st.session_state["_fish_log_was_on"] = fish_log
+
+    if fish_log:
+        options = checked or all_species
+        if st.session_state.get("log_species") not in options:
+            st.session_state["log_species"] = options[0]
+        chosen_species = [st.sidebar.radio("Species on the log axis", options,
+                                           key="log_species")]
+    else:
+        chosen_species = checked
+        if not chosen_species:
+            st.sidebar.caption("No species selected — the fish bar is hidden.")
     gen_color = GENERATION_COLOR["dark" if mode == "dark" else "light"]
     flow_ramp = FLOW_RAMP["dark" if mode == "dark" else "light"]
     temp_color = TEMPERATURE_COLOR["dark" if mode == "dark" else "light"]
@@ -404,11 +423,11 @@ def render():
                "Dashed dams have no data loaded for "
                f"{year}.")
     if fish_log:
-        st.caption(":material/warning: On a log scale the fish bar's stacked "
-                   "segments are no longer proportional to their counts — a "
-                   "segment's height is the gap between two logarithms, not the "
-                   "value. Read species totals from the table, and use the log "
-                   "scale to see which small species are present at all.")
+        st.caption(f"Log scale shows one species at a time — currently "
+                   f"**{chosen_species[0]}**. Stacking is disabled here because "
+                   "on a log axis a segment's height is the gap between two "
+                   "logarithms rather than its count, which would misstate every "
+                   "species but the bottom one.")
     st.caption("The three bars use three different y-axes, so their heights are "
                "not comparable to each other — only compare a bar with the same "
                "bar in other months. All three share one baseline at zero. The "
