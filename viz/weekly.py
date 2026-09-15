@@ -137,14 +137,19 @@ def render():
              "have generation, passage and temperature.",
     )
 
-    years = st.sidebar.multiselect("Years", options=all_years, default=all_years)
+    # Default to the most recent years, and keep the most recent when the cap
+    # bites. Defaulting to everything and then truncating from the FRONT meant
+    # that once a deep backfill landed, the page silently showed the OLDEST
+    # eight years -- which for most dams is no data at all.
+    years = st.sidebar.multiselect("Years", options=all_years,
+                                   default=all_years[-MAX_YEARS:])
     if len(years) > MAX_YEARS:
         st.sidebar.warning(
-            f"Showing the first {MAX_YEARS} years selected. Past {MAX_YEARS} "
-            "series the categorical palette would have to reuse a hue, which is "
-            "indistinguishable under colour-vision deficiency."
+            f"Showing the {MAX_YEARS} most recent years selected. Past "
+            f"{MAX_YEARS} series the categorical palette would have to reuse a "
+            "hue, which is indistinguishable under colour-vision deficiency."
         )
-        years = years[:MAX_YEARS]
+        years = years[-MAX_YEARS:]
 
     passage_dams = [d for d in dams if has(d, "passage")]
     if passage_dams:
