@@ -22,7 +22,8 @@ import streamlit as st
 from dams import MONTHLY_DAM_ORDER
 from viz.axes import (BAR_BAND, FLOW_LABELS, MIN_COVERAGE, MONTHS, _axis_ticks,
                       _temp_axis_range, shared_zero_ranges)
-from viz.data import (load_dam_names, load_dam_years, load_global_temp_range,
+from viz.data import (load_comparable_years, load_dam_names,
+                      load_global_temp_range,
                       load_monthly_flow, load_monthly_generation,
                       load_monthly_passage, load_monthly_temperature,
                       load_species)
@@ -284,10 +285,11 @@ def render():
 
     st.sidebar.title("Year-over-year filters")
 
-    # Only dams that have at least one pair of consecutive years can be
-    # differenced at all, so the selector does not offer the rest.
-    pairs = {d: [y for y in load_dam_years(d) if (y - 1) in set(load_dam_years(d))]
-             for d in MONTHLY_DAM_ORDER}
+    # Only offer dams and years that can actually be differenced: a year must
+    # share at least one substantially-loaded month with its predecessor. Mere
+    # presence of rows is not enough -- a refresh can leave a few stray hours in
+    # an otherwise empty year, and offering that produces an empty chart.
+    pairs = load_comparable_years()
     dam_options = [d for d in MONTHLY_DAM_ORDER if pairs.get(d)]
     if not dam_options:
         st.title("Year-over-year change")

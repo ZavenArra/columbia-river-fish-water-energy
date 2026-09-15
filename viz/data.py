@@ -349,3 +349,59 @@ def load_dam_years(dam: str) -> list:
             SELECT DISTINCT substr(date, 1, 4) FROM fish_passage WHERE dam_code = :d
         """, conn, params={"d": dam})["y"].dropna().astype(int)
     return sorted(rows.unique().tolist())
+
+
+@st.cache_data(ttl=CACHE_TTL)
+def load_month_coverage() -> pd.DataFrame:
+    """
+    -> dam_code, year, month, gen_hours, passage_days
+
+    One small query describing how much data each dam-month actually holds, so
+    a page can tell "this month is loaded" from "a couple of stray rows landed
+    here" without loading every frame to find out.
+    """
+    with _connect() as conn:
+        gen = pd.read_sql_query("""
+            SELECT dam_code,
+                   CAST(substr(date_hour, 1, 4) AS INTEGER) AS year,
+                   CAST(substr(date_hour, 6, 2) AS INTEGER) AS month,
+                   COUNT(gen_mw) AS gen_hours, COUNT(total_flow_kcfs) AS flow_hours
+            FROM flow_generation GROUP BY 1, 2, 3
+        """, conn)
+        fish = pd.read_sql_query("""
+            SELECT dam_code,
+                   CAST(substr(date, 1, 4) AS INTEGER) AS year,
+                   CAST(substr(date, 6, 2) AS INTEGER) AS month,
+                   COUNT(DISTINCT date) AS passage_days
+            FROM fish_passage WHERE count IS NOT NULL GROUP BY 1, 2, 3
+        """, conn)
+    return gen.merge(fish, on=["dam_code", "year", "month"], how="outer").fillna(0)
+
+
+@st.cache_data(ttl=CACHE_TTL)
+def load_comparable_years() -> dict:
+    """
+    dam -> [years that can be differenced against the year before them].
+
+    A year qualifies only where it shares at least one substantially-loaded
+    month with its predecessor. Presence of a row is not enough: a refresh can
+    leave a handful of hours in an otherwise empty year, and offering that as a
+    comparison produces an empty chart and a puzzled user.
+    """
+    cov = load_month_coverage()
+    if cov.empty:
+        return {}
+    import calendar as _cal
+    hours = cov.apply(
+        lambda r: _cal.monthrange(int(r["year"]), int(r["month"]))[1] * 24, axis=1)
+    solid = cov[(cov["flow_hours"] >= 0.9 * hours) | (cov["passage_days"] >= 20)]
+    have = {}
+    for (dam, year), grp in solid.groupby(["dam_code", "year"]):
+        have.setdefault(dam, {})[int(year)] = set(grp["month"].astype(int))
+    out = {}
+    for dam, years in have.items():
+        usable = sorted(y for y in years
+                        if (y - 1) in years and years[y] & years[y - 1])
+        if usable:
+            out[dam] = usable
+    return out
