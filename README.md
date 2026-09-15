@@ -285,6 +285,40 @@ between the red and yellow species in hue and cannot clear the normal-vision
 floor against both; it is separated instead by being its own bar in a fixed
 position with its own axis and legend group.
 
+### Running as a service
+
+The app runs continuously under systemd on port 8501, started at boot and
+restarted if it dies:
+
+```bash
+sudo systemctl status dam-dashboard     # state, uptime, current PID
+sudo systemctl restart dam-dashboard    # after pulling new code
+sudo journalctl -u dam-dashboard -f     # follow the log
+```
+
+The unit is `/etc/systemd/system/dam-dashboard.service`. It runs from
+`/root/dam-dashboard` with only `data/` writable — the ETL writes the SQLite
+file, its logs and the raw cache; everything else is read-only to the service.
+`ProtectHome` is deliberately not set, since the project lives under `/root` and
+it would hide the app from itself.
+
+**The service binds to `0.0.0.0` and there is no firewall on this host, so the
+dashboard is reachable by anyone who knows the address.** The data is all public
+government data, but the "Refresh recent data" button is unauthenticated and
+each press fires ~120 outbound requests at DART, USACE and CWMS. To close that
+off, either bind to localhost and reach it over an SSH tunnel:
+
+```bash
+# in the unit: --server.address 127.0.0.1
+ssh -L 8501:localhost:8501 root@<host>
+```
+
+or restrict the port to known addresses:
+
+```bash
+sudo ufw allow from <your-ip> to any port 8501 && sudo ufw enable
+```
+
 ### Refresh button
 
 "Refresh recent data" shells out to `etl/refresh.py --days 60`, shows a spinner

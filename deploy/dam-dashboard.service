@@ -1,0 +1,38 @@
+[Unit]
+Description=Columbia/Snake River Dam Dashboard (Streamlit)
+Documentation=file:///root/dam-dashboard/README.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/root/dam-dashboard
+Environment=PYTHONUNBUFFERED=1
+Environment=HOME=/root
+ExecStart=/usr/local/bin/streamlit run app.py \
+    --server.port 8501 \
+    --server.address 0.0.0.0 \
+    --server.headless true \
+    --server.fileWatcherType none \
+    --browser.gatherUsageStats false
+
+Restart=always
+RestartSec=5
+# The "Refresh recent data" button shells out to etl/refresh.py, which can take
+# ~80s; give the service room to stop cleanly while that is in flight.
+TimeoutStopSec=120
+
+# Modest hardening. ProtectHome is deliberately NOT set: the project lives
+# under /root, so it would hide the app from itself. Only the data directory
+# needs to be writable -- the ETL writes the SQLite file, its logs and the raw
+# cache; everything else the service touches is read-only.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+ReadWritePaths=/root/dam-dashboard/data
+
+[Install]
+WantedBy=multi-user.target
