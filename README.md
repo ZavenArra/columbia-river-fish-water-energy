@@ -191,8 +191,9 @@ Things the parsers handle that are easy to miss, all confirmed against live data
 
 ## Dashboard
 
-Two pages: **Weekly overview** (several dams and years at once) and **Monthly
-profile** (one dam, one year, in detail).
+Three pages: **Weekly overview** (several dams and years at once), **Monthly
+profile** (one dam, one year, in detail), and **Year-over-year** (one dam,
+monthly change against the preceding year).
 
 ```bash
 # 1. Load some history (once). Each year is ~15 min for all dams.
@@ -268,9 +269,11 @@ the database, and the temperature band uses the global temperature range, so
 both are identical on every dam and year — bar heights and line heights mean the
 same thing from chart to chart. The generation and flow axes still scale per
 chart. On the log fish axis the ceiling is scaled in exponent space, keeping the
-tallest bar in the same place and clear of the temperature band; note that
-stacked segments on a log axis are not proportional to their counts, so the
-table is the place to read per-species values.
+tallest bar in the same place and clear of the temperature band. Log mode plots
+**one species at a time** — a log axis cannot carry a stack, since a segment's
+height becomes the gap between two logarithms rather than its count. Enabling it
+picks the first species currently ticked; after that the choice is yours, and
+unticking log restores the checkboxes untouched.
 
 Generation is stippled so it cannot be mistaken for the red Shad segment beside
 it — orange sits between the red and yellow species in hue and cannot clear the
@@ -284,6 +287,27 @@ as the dark lightness band is too narrow for six hues. Generation orange sits
 between the red and yellow species in hue and cannot clear the normal-vision
 floor against both; it is separated instead by being its own bar in a fixed
 position with its own axis and legend group.
+
+### Year-over-year page
+
+For one dam, each monthly measure differenced against the same month a year
+earlier. Increases stack upward from the zero line, decreases downward — that is
+Plotly's `barmode="relative"`. Target year is a select plus Previous/Next
+stepping, limited to years whose predecessor is loaded, defaulting to the most
+recent complete year.
+
+The three difference axes are scaled independently but **share one zero line**,
+so whether a bar rises or falls is directly comparable even though their heights
+are not. Temperature is not differenced — two lines read far better than a line
+of changes — so the target year is solid and the preceding year dotted, on the
+same pinned band the monthly page uses.
+
+A month appears only where **both** years have usable data. A missing month is
+not a change of zero, so it is left blank and named beneath the chart rather
+than filled in.
+
+There is no log toggle here: a change can be negative and a log axis cannot
+show that.
 
 ### Running as a service
 
