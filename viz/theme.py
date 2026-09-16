@@ -160,3 +160,24 @@ def temperature_segments(xs, values):
             cur_band, cur = band, [cur[-1], point]   # repeat to bridge the gap
     runs.append((cur_band, cur))
     return [(band, [p[0] for p in pts], [p[1] for p in pts]) for band, pts in runs]
+
+
+def temperature_colorscale(zmin: float, zmax: float, mode: str = "light") -> list:
+    """
+    A Plotly colorscale with hard edges at the thermal-stress thresholds.
+
+    Repeating each stop at the same normalised position is what gives a step
+    rather than a gradient, so 67.9 F and 68.1 F are visibly different colours
+    instead of two neighbouring shades. The stops are anchored to ABSOLUTE
+    temperatures, which is why the caller must pass a fixed z range: rescaling
+    per chart would slide 68 F around and the bands would stop meaning anything.
+    """
+    span = (zmax - zmin) or 1.0
+    p68 = min(max((68.0 - zmin) / span, 0.0), 1.0)
+    p72 = min(max((72.0 - zmin) / span, 0.0), 1.0)
+    cool = temp_band_color("cool", mode)
+    serious = temp_band_color("serious", mode)
+    critical = temp_band_color("critical", mode)
+    return [[0.0, cool], [p68, cool],
+            [p68, serious], [p72, serious],
+            [p72, critical], [1.0, critical]]

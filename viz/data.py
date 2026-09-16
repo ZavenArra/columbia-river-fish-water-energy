@@ -405,3 +405,45 @@ def load_comparable_years() -> dict:
         if usable:
             out[dam] = usable
     return out
+
+
+@st.cache_data(ttl=CACHE_TTL)
+def load_temperature_grid(year: int, dams: tuple) -> pd.DataFrame:
+    """
+    -> DataFrame indexed by dam_code, one column per month (1-12), max degF.
+
+    Monthly MAXIMUM, matching the temperature shown everywhere else in the app.
+    Dam-months with no reading stay NaN rather than becoming zero, so a gap in
+    the record is drawn as a gap rather than as impossibly cold water.
+    """
+    if not dams:
+        return pd.DataFrame()
+    marks = ",".join("?" * len(dams))
+    with _connect() as conn:
+        df = pd.read_sql_query(f"""
+            SELECT dam_code,
+                   CAST(substr(date, 6, 2) AS INTEGER) AS month,
+                   MAX(value_f) AS max_f
+            FROM temperature
+            WHERE substr(date, 1, 4) = ? AND dam_code IN ({marks})
+              AND value_f IS NOT NULL
+            GROUP BY dam_code, month
+        """, conn, params=[str(year)] + list(dams))
+    if df.empty:
+        return pd.DataFrame()
+    grid = df.pivot(index="dam_code", columns="month", values="max_f")
+    return grid.reindex(index=list(dams), columns=range(1, 13))
+
+
+@st.cache_data(ttl=CACHE_TTL)
+def load_temperature_years(dams: tuple) -> list:
+    """Years with any temperature reading for the given dams."""
+    if not dams:
+        return []
+    marks = ",".join("?" * len(dams))
+    with _connect() as conn:
+        rows = pd.read_sql_query(f"""
+            SELECT DISTINCT substr(date, 1, 4) AS y FROM temperature
+            WHERE dam_code IN ({marks}) AND value_f IS NOT NULL ORDER BY y
+        """, conn, params=list(dams))["y"].astype(int)
+    return sorted(rows.unique().tolist())

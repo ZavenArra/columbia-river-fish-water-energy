@@ -191,9 +191,10 @@ Things the parsers handle that are easy to miss, all confirmed against live data
 
 ## Dashboard
 
-Three pages: **Weekly overview** (several dams and years at once), **Monthly
-profile** (one dam, one year, in detail), and **Year-over-year** (one dam,
-monthly change against the preceding year).
+Four pages: **Weekly overview** (several dams and years at once), **Monthly
+profile** (one dam, one year, in detail), **Year-over-year** (one dam, monthly
+change against the preceding year), and **Corridor temperature** (all eight
+migration dams at once).
 
 ```bash
 # 1. Load some history (once). Each year is ~15 min for all dams.
@@ -319,6 +320,23 @@ than filled in.
 
 There is no log toggle here: a change can be negative and a log axis cannot
 show that.
+
+### Corridor temperature page
+
+Months across, the eight dams a Snake River salmon climbs down the side
+(Bonneville at the top, Lower Granite at the bottom — the order a fish meets
+them), temperature as colour. Same thermal-stress bands as the other pages, but
+with **hard edges** at 68 °F and 72 °F rather than a gradient, so the chart
+answers "where and when does the corridor become dangerous" instead of "what
+shade is July".
+
+The z range is fixed across years. It has to be: the band edges are anchored to
+absolute temperatures, so rescaling per year would slide 68 °F around until the
+colours stopped meaning anything. Each cell carries its value in dark ink —
+white labels measure about 2.6:1 on the orange band, which fails.
+
+DART's water-quality monitors are seasonal, so winter months are usually empty
+for every dam; those columns are left blank and the page says so.
 
 ### Running as a service
 

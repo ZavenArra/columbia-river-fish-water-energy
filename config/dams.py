@@ -207,3 +207,9 @@ RIVER_MILE = {
 # Which river each dam sits on, for the schematic.
 RIVER_OF = {**{d: "Columbia" for d in COLUMBIA_MAINSTEM},
             **{d: "Snake" for d in SNAKE_MAINSTEM}}
+
+
+# The migration corridor a Snake River salmon actually climbs: the four lower
+# Columbia dams, then the four lower Snake dams above the confluence. Listed
+# downstream to upstream, which is the order a fish meets them.
+MIGRATION_CORRIDOR = ["BON", "TDA", "JDA", "MCN", "IHR", "LMN", "LGS", "LWG"]
