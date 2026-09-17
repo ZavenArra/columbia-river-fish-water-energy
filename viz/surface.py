@@ -36,13 +36,13 @@ def corridor_surface(grid, *, names, zmin, zmax, mode, title):
 
     # Reversed so the first dam listed sits at the TOP: the y axis then reads
     # downstream to upstream, the order a fish meets them.
-    dams = [d for d in grid.index][::-1]
-    z = [[grid.loc[d, m] for m in range(1, 13)] for d in dams]
+    dams = [d for d in grid.index]
+    z = [[grid.loc[d, m] for d in dams] for m in range(1, 13)]
     labels = [f"{names.get(d, d)} ({d})" for d in dams]
     text = [[("" if pd.isna(v) else f"{v:.0f}") for v in row] for row in z]
 
     fig = go.Figure(go.Heatmap(
-        x=MONTHS, y=labels, z=z,
+        x=labels, y=MONTHS, z=z,
         zmin=zmin, zmax=zmax,
         colorscale=temperature_colorscale(zmin, zmax, mode),
         # Gaps stay gaps: a dam-month with no reading is not cold water.
@@ -64,14 +64,15 @@ def corridor_surface(grid, *, names, zmin, zmax, mode, title):
     fig.update_layout(
         title=dict(text=title, x=0, xanchor="left", y=0.97, yanchor="top",
                    font=dict(size=15, color=ink["primary"])),
-        height=460, margin=dict(l=170, r=20, t=58, b=60),
+        height=630, margin=dict(l=170, r=20, t=58, b=60),
         paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
         font=dict(color=ink["secondary"]),
-        xaxis=dict(title_text="Month", side="bottom", showgrid=False,
+        yaxis=dict(title_text="Month",  showgrid=False,
                    tickfont=dict(size=11), title_font=dict(size=12),
                    categoryorder="array", categoryarray=MONTHS),
-        yaxis=dict(title_text="", showgrid=False, tickfont=dict(size=11),
-                   automargin=True),
+        xaxis=dict(title_text="", side="bottom", showgrid=False, tickfont=dict(size=11),
+                   automargin=True
+                   ),
     )
     return fig
 
