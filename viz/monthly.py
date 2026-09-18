@@ -205,15 +205,21 @@ def monthly_chart(passage, generation, flow, temperature, *, species_order,
                     range=bar_range(gen_top), tick0=0, dtick=gen_dtick,
                     overlaying="y", side="right", showgrid=False,
                     zeroline=False, showline=True, linecolor=gen_color,
-                    tickfont=dict(size=11, color=gen_color), tickformat="~s"),
+                    tickfont=dict(size=11, color=gen_color), tickformat="~s",
+                    anchor="free",  # Required for autoshift to work
+                    autoshift=True  # Automatically shifts to avoid overlap
+                    ),
         yaxis3=dict(title=dict(text="acre-feet",
                                font=dict(size=12, color=flow_ramp["gen_af"])),
                     range=bar_range(flow_top), tick0=0, dtick=flow_dtick,
-                    overlaying="y", side="right", position=0.945, anchor="free",
+                    overlaying="y", side="right", position=0.945,
                     showgrid=False, zeroline=False, showline=True,
                     linecolor=flow_ramp["gen_af"],
                     tickfont=dict(size=11, color=flow_ramp["gen_af"]),
-                    tickformat="~s"),
+                    tickformat="~s",
+                    anchor="free",  # Required for autoshift to work
+                    autoshift=True  # Automatically shifts to avoid overlap),
+                    )
     )
 
     # Drawn whenever bounds exist, even if this dam-year has no readings, so
@@ -222,7 +228,7 @@ def monthly_chart(passage, generation, flow, temperature, *, species_order,
         fig.update_layout(yaxis4=dict(
             title=dict(text="Max temperature (°F)",
                        font=dict(size=12, color=ink["secondary"])),
-            range=temp_range, overlaying="y", side="left", anchor="free",
+            range=temp_range, overlaying="y", side="left",
             position=0.0, showgrid=False, zeroline=False,
             # No axis line: it would run the full plot height and imply the
             # temperature scale extends down through the bars, when the line
@@ -230,7 +236,10 @@ def monthly_chart(passage, generation, flow, temperature, *, species_order,
             showline=False,
             linecolor=ink["secondary"], tickmode="array", tickvals=temp_ticks,
             ticktext=[f"{v:.0f}" for v in temp_ticks],
-            tickfont=dict(size=11, color=ink["secondary"])))
+            tickfont=dict(size=11, color=ink["secondary"]),
+anchor="free",  # Required for autoshift to work
+                    autoshift=True  # Automatically shifts to avoid overlap
+            ))
     return fig
 
 

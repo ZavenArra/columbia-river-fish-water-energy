@@ -63,25 +63,25 @@ def refresh_control():
 def weekly_page():
     from viz import weekly
     weekly.render()
-    refresh_control()
+    # refresh_control()
 
 
 def monthly_page():
     from viz import monthly
     monthly.render()
-    refresh_control()
+    # refresh_control()
 
 
 def delta_page():
     from viz import delta
     delta.render()
-    refresh_control()
+    # refresh_control()
 
 
 def corridor_page():
     from viz import surface
     surface.render()
-    refresh_control()
+    # refresh_control()
 
 
 def main():
@@ -96,8 +96,8 @@ def main():
         return
 
     nav = st.navigation([
-        st.Page(weekly_page, title="Weekly overview", icon="📈", default=True),
-        st.Page(monthly_page, title="Monthly profile", icon="📊"),
+        # st.Page(weekly_page, title="Weekly overview", icon="📈", default=True),
+        st.Page(monthly_page, title="Monthly profile", icon="📊", default=True),
         st.Page(delta_page, title="Year-over-year", icon="📉"),
         st.Page(corridor_page, title="Corridor temperature", icon="🌡️"),
     ])
